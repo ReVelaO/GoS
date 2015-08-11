@@ -8,7 +8,7 @@ Config.addParam("E", "Use E", SCRIPT_PARAM_ONOFF, true)
 Config.addParam("R", "Use R", SCRIPT_PARAM_ONOFF, true)
 PrintChat("<font color=\"#a375ff\"><b>[DarkRyze v1.0.1 By DarkFight] </b></font> <font color=\"#FFFFFF\">Loaded and Ready to use.</font>")
 
-               
+--5.15 Working.               
 local Stacks = "ryzepassivestack"
 local FullStacks = "ryzepassivecharged"
 				
