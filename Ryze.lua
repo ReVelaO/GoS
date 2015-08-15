@@ -11,8 +11,8 @@ PrintChat("<font color=\"#a375ff\"><b>[DarkRyze v1.0.1 By DarkFight] </b></font>
 --5.15 Working.               
 local Cargas = "ryzepassivestack"
 local Pasiva = "ryzepassivecharged"
-local QPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,true,true)
-                        			local QWithWPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)
+
+
 				
 				
 
@@ -25,11 +25,11 @@ OnLoop(function(myHero)
 						if CanUseSpell(myHero, _W) == READY and Config.W then
 						CastTargetSpell(target, _W)
 						end
-
-                        			
+                     	
+						local QPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,true,true)
+						local QWithWPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)		
                         			if CanUseSpell(myHero, _Q) == READY and QWithWPred.HitChance == 1 and Config.Q and (GotBuff(target, "RyzeW") > 0) then
-                        			CastSkillShot(_Q,QWithWPred.PredPos.x,QWithWPred.PredPos.y,QWithWPred.PredPos.z)
-						
+                        			CastSkillShot(_Q,QWithWPred.PredPos.x,QWithWPred.PredPos.y,QWithWPred.PredPos.z)						
 						elseif CanUseSpell(myHero, _Q) == READY and QPred.HitChance == 1 and Config.Q then
 						CastSkillShot(_Q,QPred.PredPos.x,QPred.PredPos.y,QPred.PredPos.z)
 	                    			end
