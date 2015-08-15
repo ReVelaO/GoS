@@ -11,7 +11,8 @@ PrintChat("<font color=\"#a375ff\"><b>[DarkRyze v1.0.1 By DarkFight] </b></font>
 --5.15 Working.               
 local Cargas = "ryzepassivestack"
 local Pasiva = "ryzepassivecharged"
-
+local QPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,true,true)
+                        			local QWithWPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)
 				
 				
 
@@ -25,8 +26,7 @@ OnLoop(function(myHero)
 						CastTargetSpell(target, _W)
 						end
 
-                        			local QPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,true,true)
-                        			local QWithWPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)
+                        			
                         			if CanUseSpell(myHero, _Q) == READY and QWithWPred.HitChance == 1 and Config.Q and (GotBuff(target, "RyzeW") > 0) then
                         			CastSkillShot(_Q,QWithWPred.PredPos.x,QWithWPred.PredPos.y,QWithWPred.PredPos.z)
 						
