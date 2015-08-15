@@ -27,7 +27,7 @@ OnLoop(function(myHero)
 
                         			local QPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,true,true)
                         			local QWithWPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)
-                        			if CanUseSpell(myHero, _Q) == READY and Q2Pred.HitChance == 1 and Config.Q and (GotBuff(target, "RyzeW") > 0) then
+                        			if CanUseSpell(myHero, _Q) == READY and QWithWPred.HitChance == 1 and Config.Q and (GotBuff(target, "RyzeW") > 0) then
                         			CastSkillShot(_Q,QWithWPred.PredPos.x,QWithWPred.PredPos.y,QWithWPred.PredPos.z)
 						
 						elseif CanUseSpell(myHero, _Q) == READY and QPred.HitChance == 1 and Config.Q then
