@@ -13,6 +13,44 @@ local Pasiva = "ryzepassivecharged"
 
 OnLoop(function(myHero)
                 
+if GetLevel(myHero) == 1 then
+	LevelSpell(_Q)
+elseif GetLevel(myHero) == 2 then
+	LevelSpell(_W)
+elseif GetLevel(myHero) == 3 then
+	LevelSpell(_E)
+elseif GetLevel(myHero) == 4 then
+        LevelSpell(_Q)
+elseif GetLevel(myHero) == 5 then
+        LevelSpell(_W)
+elseif GetLevel(myHero) == 6 then
+	LevelSpell(_R)
+elseif GetLevel(myHero) == 7 then
+	LevelSpell(_Q)
+elseif GetLevel(myHero) == 8 then
+        LevelSpell(_W)
+elseif GetLevel(myHero) == 9 then
+        LevelSpell(_Q)
+elseif GetLevel(myHero) == 10 then
+        LevelSpell(_W)
+elseif GetLevel(myHero) == 11 then
+        LevelSpell(_R)
+elseif GetLevel(myHero) == 12 then
+        LevelSpell(_Q)
+elseif GetLevel(myHero) == 13 then
+        LevelSpell(_W)
+elseif GetLevel(myHero) == 14 then
+        LevelSpell(_E)
+elseif GetLevel(myHero) == 15 then
+        LevelSpell(_E)
+elseif GetLevel(myHero) == 16 then
+        LevelSpell(_R)
+elseif GetLevel(myHero) == 17 then
+        LevelSpell(_E)
+elseif GetLevel(myHero) == 18 then
+        LevelSpell(_E)
+end
+
 if IWalkConfig.Combo then
 local target = GetTarget(1000, DAMAGE_MAGIC)
 if ValidTarget(target, 1000) then
