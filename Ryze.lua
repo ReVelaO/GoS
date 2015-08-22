@@ -6,7 +6,7 @@ Config.addParam("Q", "Use Q", SCRIPT_PARAM_ONOFF, true)
 Config.addParam("W", "Use W", SCRIPT_PARAM_ONOFF, true)
 Config.addParam("E", "Use E", SCRIPT_PARAM_ONOFF, true)
 Config.addParam("R", "Use R", SCRIPT_PARAM_ONOFF, true)
-PrintChat("<font color=\"#a375ff\"><b>[DarkRyze v1.1.2 By DarkFight] </b></font> <font color=\"#FFFFFF\">Loaded and Ready to use.</font>")
+PrintChat("<font color=\"#a375ff\"><b>[DarkRyze v1.1.3 By DarkFight] </b></font> <font color=\"#FFFFFF\">Loaded and Ready to use.</font>")
 
 --Reworked Combo, 5.16 Working.               
 local Pasiva = "ryzepassivecharged"
