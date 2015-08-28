@@ -6,6 +6,7 @@ Config.addParam("Q", "Use Q", SCRIPT_PARAM_ONOFF, true)
 Config.addParam("W", "Use W", SCRIPT_PARAM_ONOFF, true)
 Config.addParam("E", "Use E", SCRIPT_PARAM_ONOFF, true)
 Config.addParam("R", "Use R", SCRIPT_PARAM_ONOFF, true)
+Config.addParam("RR", "Use R if rooted", SCRIPT_PARAM_ONOFF, true)
 PrintChat("<font color=\"#00bfff\"><b>[DarkRyze v1.1.3 By DarkFight] </b></font> <font color=\"#FFFFFF\">Loaded and Ready to use.</font>")
 
 --Reworked Combo, 5.16 Working.               
@@ -69,6 +70,8 @@ CastTargetSpell(target, _E)
 end
 
 if CanUseSpell(myHero, _R) == READY and Config.R and (GotBuff(myHero, "ryzepassivecharged") > 0) then
+CastSpell(_R)
+elseif CanUseSpell(myHero, _R) == READY and Config.RR and (GotBuff(myHero, "ryzepassivecharged") > 0) and (GotBuff(target , "RyzeW") == 1) then
 CastSpell(_R)
 end				
 end
