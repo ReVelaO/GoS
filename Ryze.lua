@@ -10,6 +10,7 @@ local Combo = root.addItem(SubMenu.new("Combo"))
 	local Comb = Combo.addItem(MenuKeyBind.new("Combo", 32))
 local Misc = root.addItem(SubMenu.new("Misc"))
 	local ALP = Misc.addItem(MenuBool.new("Auto Level Spells",true))
+	local AIT = Misc.addItem(MenuBool.new("Auto Ignite (Kill/KS)",true))
 --Reworked Combo, 5.16 Working.               
 local Pasiva = "ryzepassivecharged"
 
@@ -123,4 +124,16 @@ end
 
 function GetMyHeroPos()
     return GetOrigin(GetMyHero()) 
+end
+
+Ignite = (GetCastName(GetMyHero(),SUMMONER_1):lower():find("summonerdot") and SUMMONER_1 or (GetCastName(GetMyHero(),SUMMONER_2):lower():find("summonerdot") and SUMMONER_2 or nil))
+
+function AutoIgnite()
+    if Ignite and AIT.getValue() then
+        for _, k in pairs(GetEnemyHeroes()) do
+            if CanUseSpell(GetMyHero(), Ignite) == READY and (20*GetLevel(GetMyHero())+50) > GetCurrentHP(k)+GetHPRegen(k)*2.5 and GetDistanceSqr(GetOrigin(k)) < 600*600 then
+                CastTargetSpell(k, Ignite)
+            end
+        end
+    end
 end
