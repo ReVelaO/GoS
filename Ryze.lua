@@ -7,7 +7,7 @@ local Combo = root.addItem(SubMenu.new("Combo"))
 	local EU = Combo.addItem(MenuBool.new("Use E",true))
 	local RU = Combo.addItem(MenuBool.new("Use R",true))
 	local RRU = Combo.addItem(MenuBool.new("Use R if rooted",true))
-	local ComboActive = Combo.addItem(MenuKeyBind.new("Combo", 32))
+	local Comb = Combo.addItem(MenuKeyBind.new("Combo", 32))
 local Misc = root.addItem(SubMenu.new("Misc"))
 	local ALP = Misc.addItem(MenuBool.new("Auto Level Spells",true))
 --Reworked Combo, 5.16 Working.               
@@ -56,7 +56,7 @@ elseif GetLevel(myHero) == 18 then
         LevelSpell(_E)
 end
 
-if ComboActive.getValue() then 
+if Comb.getValue() then 
 	if ValidTarget(target, 900) then					
 		if CanUseSpell(myHero, _W) == READY and QU.getValue() then
 			CastTargetSpell(target, _W)
