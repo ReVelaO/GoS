@@ -58,8 +58,8 @@ if Comb.getValue() then
 			CastTargetSpell(target, _E)
 			end
 		
-		local RPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),math.huge,125,800,180,false,true)		
-		if CanUseSpell(myHero, _R) == READY and EnemiesAround(GetMyHeroPos(), 800) > sl.getValue() and RPred.HitChance == 1 and RU.getValue() then
+		local RPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),math.huge,125,700,180,false,true)		
+		if CanUseSpell(myHero, _R) == READY and EnemiesAround(GetMyHeroPos(), 700) > sl.getValue() and RPred.HitChance == 1 and RU.getValue() then
 			CastSkillShot(_R,RPred.PredPos.x,RPred.PredPos.y,RPred.PredPos.z)				
 			end 
 		end
