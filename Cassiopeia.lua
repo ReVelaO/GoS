@@ -9,6 +9,13 @@ local Combo = root.addItem(SubMenu.new("Combo"))
 	local sl = Combo.addItem(MenuSlider.new("Min. Enemy for R", 1, 1, 5, 1))
 	local Comb = Combo.addItem(MenuKeyBind.new("Combo", 32))
 
+local Drawings = root.addItem(SubMenu.new("Drawings"))
+	local DrawQ = Drawings.addItem(MenuBool.new("Draw Q and W Range",true))
+	local DrawE = Drawings.addItem(MenuBool.new("Draw E Range",true))
+	local DrawHD = Drawings.addItem(MenuSlider.new("Quality Circles (High Number More FPS)", 255, 1, 255, 1))
+	
+local Misc = root.addItem(SubMenu.new("Misc"))
+	local ALS = Misc.addItem(MenuBool.new("Auto Level Spells",true))
 do
   _G.objectManager = {}
   objectManager.maxObjects = 0
@@ -33,6 +40,50 @@ end
 	
 OnLoop(function(myHero)
 
+if GetLevel(myHero) == 1 then
+	LevelSpell(_E)
+elseif GetLevel(myHero) == 2 then
+	LevelSpell(_Q)
+elseif GetLevel(myHero) == 3 then
+	LevelSpell(_W)
+elseif GetLevel(myHero) == 4 then
+        LevelSpell(_E)
+elseif GetLevel(myHero) == 5 then
+        LevelSpell(_Q)
+elseif GetLevel(myHero) == 6 then
+	LevelSpell(_R)
+elseif GetLevel(myHero) == 7 then
+	LevelSpell(_W)
+elseif GetLevel(myHero) == 8 then
+        LevelSpell(_E)
+elseif GetLevel(myHero) == 9 then
+        LevelSpell(_Q)
+elseif GetLevel(myHero) == 10 then
+        LevelSpell(_Q)
+elseif GetLevel(myHero) == 11 then
+        LevelSpell(_R)
+elseif GetLevel(myHero) == 12 then
+        LevelSpell(_W)
+elseif GetLevel(myHero) == 13 then
+        LevelSpell(_E)
+elseif GetLevel(myHero) == 14 then
+        LevelSpell(_Q)
+elseif GetLevel(myHero) == 15 then
+        LevelSpell(_E)
+elseif GetLevel(myHero) == 16 then
+        LevelSpell(_R)
+elseif GetLevel(myHero) == 17 then
+        LevelSpell(_W)
+elseif GetLevel(myHero) == 18 then
+        LevelSpell(_W)
+end
+
+if DrawQ.getValue() then
+	DrawCircle(GetOrigin(myHero),850,3,DrawHD.getValue(),0xff00FA9A)
+end
+if DrawE.getValue() then
+	DrawCircle(GetOrigin(myHero),700,3,DrawHD.getValue(),0xff00FA9A)
+end
 
 if Comb.getValue() then 
 	local myHeroPos = GetOrigin(myHero)
@@ -58,8 +109,8 @@ if Comb.getValue() then
 			CastTargetSpell(target, _E)
 			end
 		
-		local RPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),math.huge,125,700,180,false,true)		
-		if CanUseSpell(myHero, _R) == READY and EnemiesAround(GetMyHeroPos(), 700) > sl.getValue() and RPred.HitChance == 1 and RU.getValue() then
+		local RPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),math.huge,550,800,180,false,true)		
+		if CanUseSpell(myHero, _R) == READY and EnemiesAround(GetMyHeroPos(), 800) > sl.getValue() and RPred.HitChance == 1 and RU.getValue() then
 			CastSkillShot(_R,RPred.PredPos.x,RPred.PredPos.y,RPred.PredPos.z)				
 			end 
 		end
