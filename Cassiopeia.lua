@@ -58,7 +58,7 @@ if Comb.getValue() then
 			CastTargetSpell(target, _E)
 			end
 		
-		local RPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),math.huge,550,800,180,false,true)	-- Do u know Kappa	
+		local RPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),math.huge,125,800,180,false,true)	-- Do u know Kappa	
 		if CanUseSpell(myHero, _R) == READY and EnemiesAround(GetMyHeroPos(), 800) >= 1 and RPred.HitChance == 1 and RU.getValue() and sl.getValue(1) then
 			CastSkillShot(_R,RPred.PredPos.x,RPred.PredPos.y,RPred.PredPos.z)
 		elseif CanUseSpell(myHero, _R) == READY and EnemiesAround(GetMyHeroPos(), 800) >= 2 and RPred.HitChance == 1 and RU.getValue() and sl.getValue(2) then
