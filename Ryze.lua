@@ -1,10 +1,6 @@
 require('DLib')
 require('IAC')
 
-local version = 1.1.5
-local UP=Updater.new("WeinerCH/GoS/Ryze.lua", "GoS\\Ryze", version)
-if UP.newVersion() then UP.update() end
-
 local root = menu.addItem(SubMenu.new("DarkRyze"))
 local Combo = root.addItem(SubMenu.new("Combo"))
 	local QU = Combo.addItem(MenuBool.new("Use Q",true))
