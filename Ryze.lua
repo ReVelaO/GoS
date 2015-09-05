@@ -1,4 +1,5 @@
 require('DLib')
+require('IAC')
 
 local root = menu.addItem(SubMenu.new("DarkRyze"))
 local Combo = root.addItem(SubMenu.new("Combo"))
@@ -8,89 +9,51 @@ local Combo = root.addItem(SubMenu.new("Combo"))
 	local RU = Combo.addItem(MenuBool.new("Use R",true))
 	local RRU = Combo.addItem(MenuBool.new("Use R if rooted",true))
 	local Comb = Combo.addItem(MenuKeyBind.new("Combo", 32))
-local Misc = root.addItem(SubMenu.new("Misc"))
-	local ALP = Misc.addItem(MenuBool.new("Auto Level Spells",true))
-	local AIT = Misc.addItem(MenuBool.new("Auto Ignite (Kill/KS)",true))
---Reworked Combo, 5.16 Working.               
-local Pasiva = "ryzepassivecharged"
-Ignite = (GetCastName(GetMyHero(),SUMMONER_1):lower():find("summonerdot") and SUMMONER_1 or (GetCastName(GetMyHero(),SUMMONER_2):lower():find("summonerdot") and SUMMONER_2 or nil))
-
-do
-  _G.objectManager = {}
-  objectManager.maxObjects = 0
-  objectManager.objects = {}
-  objectManager.heroes = {}
-  OnObjectLoop(function(object, myHero)
-    objectManager.objects[GetNetworkID(object)] = object
-  end)
-  OnLoop(function(myHero)
-    objectManager.maxObjects = 0
-    for _, obj in pairs(objectManager.objects) do
-      objectManager.maxObjects = objectManager.maxObjects + 1
-      local type = GetObjectType(obj)
-      if type == Obj_AI_Hero then
-        objectManager.heroes[_] = obj
-      else
-        local objName = GetObjectBaseName(obj)
-      end
-    end
-  end)
-end
-  
-function AutoIgnite()
-    if Ignite then
-        for _, k in pairs(GetEnemyHeroes()) do
-            if CanUseSpell(GetMyHero(), Ignite) == READY and (20*GetLevel(GetMyHero())+50) > GetCurrentHP(k)+GetHPRegen(k)*2.5 and GetDistanceSqr(GetOrigin(k)) < 600*600 then
-                CastTargetSpell(k, Ignite)
-            end
+	
+local Farm = root.addItem(SubMenu.new("Farm"))
+	local LaneClear = Farm.addItem(SubMenu.new("Lane Clear"))
+	local useQ = LaneClear.addItem(MenuBool.new("Use Q",true))
+	local useW = LaneClear.addItem(MenuBool.new("Use W",true))
+	local useE = LaneClear.addItem(MenuBool.new("Use E",true))
+	local useR = LaneClear.addItem(MenuBool.new("Use R",true))
+	local LClear = LaneClear.addItem(MenuKeyBind.new("Lane Clear", 86))
+	
+DelayAction(function ()
+        for _, imenu in pairs(menuTable) do
+                local submenu = menu.addItem(SubMenu.new(imenu.name))
+                for _,subImenu in pairs(imenu) do
+                        if subImenu.type == SCRIPT_PARAM_ONOFF then
+                                local ChangeMenu = submenu.addItem(MenuBool.new(subImenu.t, subImenu.value))
+                                OnLoop(function(myHero) subImenu.value = ChangeMenu.getValue() end)
+                        elseif subImenu.type == SCRIPT_PARAM_KEYDOWN then
+                                local ChangeMenu = submenu.addItem(MenuKeyBind.new(subImenu.t, subImenu.key))
+                                OnLoop(function(myHero) subImenu.key = ChangeMenu.getValue(true) end)
+                        elseif subImenu.type == SCRIPT_PARAM_INFO then
+                                submenu.addItem(MenuSeparator.new(subImenu.t))
+                        end
+                end
         end
-    end
-end
+        _G.DrawMenu = function ( ... )  end
+end, 1000)
+	
+--Updated 5.17.               
+local Pasiva = "ryzepassivecharged"
 
 OnLoop(function(myHero)
-if Ignite and AIT.getValue() then AutoIgnite() end
-local myHeroPos = GetOrigin(myHero)
-local target = GetCurrentTarget()
-
-if GetLevel(myHero) == 1 and ALP.getValue() then
-	LevelSpell(_Q)
-elseif GetLevel(myHero) == 2 then
-	LevelSpell(_W)
-elseif GetLevel(myHero) == 3 then
-	LevelSpell(_E)
-elseif GetLevel(myHero) == 4 then
-        LevelSpell(_Q)
-elseif GetLevel(myHero) == 5 then
-        LevelSpell(_W)
-elseif GetLevel(myHero) == 6 then
-	LevelSpell(_R)
-elseif GetLevel(myHero) == 7 then
-	LevelSpell(_Q)
-elseif GetLevel(myHero) == 8 then
-        LevelSpell(_W)
-elseif GetLevel(myHero) == 9 then
-        LevelSpell(_Q)
-elseif GetLevel(myHero) == 10 then
-        LevelSpell(_W)
-elseif GetLevel(myHero) == 11 then
-        LevelSpell(_R)
-elseif GetLevel(myHero) == 12 then
-        LevelSpell(_Q)
-elseif GetLevel(myHero) == 13 then
-        LevelSpell(_W)
-elseif GetLevel(myHero) == 14 then
-        LevelSpell(_E)
-elseif GetLevel(myHero) == 15 then
-        LevelSpell(_E)
-elseif GetLevel(myHero) == 16 then
-        LevelSpell(_R)
-elseif GetLevel(myHero) == 17 then
-        LevelSpell(_E)
-elseif GetLevel(myHero) == 18 then
-        LevelSpell(_E)
-end
-
 if Comb.getValue() then 
+	DoCombo()
+	end
+
+if LClear.getValue() then
+	LaneClear()
+	end	
+end)
+
+
+function DoCombo()
+if Comb.getValue() then 
+	local myHeroPos = GetOrigin(myHero)
+	local target = GetCurrentTarget()
 	if ValidTarget(target, 900) then					
 		if CanUseSpell(myHero, _W) == READY and WU.getValue() then
 			CastTargetSpell(target, _W)
@@ -112,7 +75,32 @@ if Comb.getValue() then
 			end
 		end
 	end
-end)
+end
+
+function LaneClear()
+if LClear.getValue() then      
+                for i,minion in pairs(GetAllMinions(MINION_ENEMY)) do    
+                        if IsInDistance(minion, 600) then
+                        local PMinion = GetOrigin(minion)
+						if CanUseSpell(myHero, _W) == READY and useW.getValue() then
+						CastTargetSpell(minion, _W)
+						end
+						
+						if CanUseSpell(myHero, _Q) == READY  and useQ.getValue() then
+						CastSkillShot(_Q,PMinion.x,PMinion.y,PMinion.z)
+						end		
+						
+						if CanUseSpell(myHero, _E) == READY and useE.getValue() then
+						CastTargetSpell(minion, _E)
+						end 		
+             
+						if CanUseSpell(myHero, _R) == READY and useR.getValue() and (GotBuff(myHero, "ryzepassivecharged") > 0) then
+						CastSpell(_R)			 
+						end
+          end
+       end
+    end    
+end
 
 function CalcDamage(source, target, addmg, apdmg)
     local ADDmg = addmg or 0
