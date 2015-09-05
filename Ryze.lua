@@ -1,6 +1,10 @@
 require('DLib')
 require('IAC')
 
+local version = 1.1.5
+local UP=Updater.new("WeinerCH/GoS/Ryze.lua", "GoS\\Ryze", version)
+if UP.newVersion() then UP.update() end
+
 local root = menu.addItem(SubMenu.new("DarkRyze"))
 local Combo = root.addItem(SubMenu.new("Combo"))
 	local QU = Combo.addItem(MenuBool.new("Use Q",true))
@@ -18,7 +22,16 @@ local Farm = root.addItem(SubMenu.new("Farm"))
 	local useR = LaneClear.addItem(MenuBool.new("Use R",true))
 	local LClear = LaneClear.addItem(MenuKeyBind.new("Lane Clear", 86))
 	
-DelayAction(function () -- Do u know who made it... (ILS)
+local Misc = root.addItem(SubMenu.new("Misc"))
+	local ALS = Misc.addItem(MenuBool.new("Auto Level Spells",true))
+	
+local Drawings = root.addItem(SubMenu.new("Drawings"))
+	local Enable = Drawings.addItem(MenuBool.new("Enable Drawings",true))
+	local DrawQ = Drawings.addItem(MenuBool.new("Draw Q Range",true))
+	local DrawWE = Drawings.addItem(MenuBool.new("Draw W + E Range",true))
+	local DrawHD = Drawings.addItem(MenuSlider.new("Quality Circles (High Number More FPS)", 255, 1, 255, 1))
+
+DelayAction(function ()
         for _, imenu in pairs(menuTable) do
                 local submenu = menu.addItem(SubMenu.new(imenu.name))
                 for _,subImenu in pairs(imenu) do
@@ -47,6 +60,14 @@ if Comb.getValue() then
 if LClear.getValue() then
 	LaneClear()
 	end	
+
+if	ALS.getValue() then
+	AutoLevelS()
+	end
+
+if Enable.getValue() then
+	Drawings()
+	end
 end)
 
 
@@ -100,6 +121,55 @@ if LClear.getValue() then
           end
        end
     end    
+end
+
+function AutoLevelS()
+if GetLevel(myHero) == 1 then
+	LevelSpell(_Q)
+elseif GetLevel(myHero) == 2 then
+	LevelSpell(_W)
+elseif GetLevel(myHero) == 3 then
+	LevelSpell(_E)
+elseif GetLevel(myHero) == 4 then
+        LevelSpell(_Q)
+elseif GetLevel(myHero) == 5 then
+        LevelSpell(_W)
+elseif GetLevel(myHero) == 6 then
+	LevelSpell(_R)
+elseif GetLevel(myHero) == 7 then
+	LevelSpell(_Q)
+elseif GetLevel(myHero) == 8 then
+        LevelSpell(_Q)
+elseif GetLevel(myHero) == 9 then
+        LevelSpell(_Q)
+elseif GetLevel(myHero) == 10 then
+        LevelSpell(_W)
+elseif GetLevel(myHero) == 11 then
+        LevelSpell(_R)
+elseif GetLevel(myHero) == 12 then
+        LevelSpell(_W)
+elseif GetLevel(myHero) == 13 then
+        LevelSpell(_E)
+elseif GetLevel(myHero) == 14 then
+        LevelSpell(_W)
+elseif GetLevel(myHero) == 15 then
+        LevelSpell(_E)
+elseif GetLevel(myHero) == 16 then
+        LevelSpell(_R)
+elseif GetLevel(myHero) == 17 then
+        LevelSpell(_E)
+elseif GetLevel(myHero) == 18 then
+        LevelSpell(_E)
+end
+end
+
+function Drawings()
+if DrawQ.getValue() then
+	DrawCircle(GetOrigin(myHero),895,3,DrawHD.getValue(),0xff7B68EE)
+	end
+if DrawWE.getValue() then
+	DrawCircle(GetOrigin(myHero),600,3,DrawHD.getValue(),0xff7B68EE)
+	end
 end
 
 function CalcDamage(source, target, addmg, apdmg)
