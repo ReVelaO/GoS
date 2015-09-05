@@ -18,7 +18,7 @@ local Farm = root.addItem(SubMenu.new("Farm"))
 	local useR = LaneClear.addItem(MenuBool.new("Use R",true))
 	local LClear = LaneClear.addItem(MenuKeyBind.new("Lane Clear", 86))
 	
-DelayAction(function ()
+DelayAction(function () -- Do u know who made it... (ILS)
         for _, imenu in pairs(menuTable) do
                 local submenu = menu.addItem(SubMenu.new(imenu.name))
                 for _,subImenu in pairs(imenu) do
