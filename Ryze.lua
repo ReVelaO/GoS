@@ -33,6 +33,8 @@ local Drawings = root.addItem(SubMenu.new("Drawings"))
 	local DrawQ = Drawings.addItem(MenuBool.new("Draw Q Range",true))
 	local DrawWE = Drawings.addItem(MenuBool.new("Draw W + E Range",true))
 	local DrawHD = Drawings.addItem(MenuSlider.new("Quality Circles (High Number More FPS)", 255, 1, 255, 1))
+	local Info = Drawings.addItem(MenuSeparator.new("If Drawings has not purple color then"))
+	local Info1 = Drawings.addItem(MenuSeparator.new("Press F6 x2"))
 
 DelayAction(function ()
         for _, imenu in pairs(menuTable) do
