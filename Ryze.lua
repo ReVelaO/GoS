@@ -68,10 +68,6 @@ if Comb.getValue() then
 	DoCombo()
 	end
 
-if AA.getValue() then
-	IOW:DisableAutoAttacks()
-	end
-	
 if LClear.getValue() then
 	LaneClear()
 	end	
@@ -94,7 +90,8 @@ function DoCombo()
 if Comb.getValue() then 
 	local myHeroPos = GetOrigin(myHero)
 	local target = GetCurrentTarget()
-	
+	if AA.getValue() then IOW:DisableAutoAttacks() end
+			
 	if ValidTarget(target, 900) then					
 		if CanUseSpell(myHero, _W) == READY and WU.getValue() then
 			CastTargetSpell(target, _W)
