@@ -39,6 +39,29 @@ local Drawings = root.addItem(SubMenu.new("Drawings"))
 --Updated 5.17.               
 local Pasiva = "ryzepassivecharged"
 
+do
+  _G.objectManager = {}
+  objectManager.maxObjects = 0
+  objectManager.objects = {}
+  objectManager.camps = {}
+  objectManager.minions = {}
+  OnObjectLoop(function(object, myHero)
+    objectManager.objects[GetNetworkID(object)] = object
+  end)
+  OnLoop(function(myHero)
+    objectManager.maxObjects = 0
+    for _, obj in pairs(objectManager.objects) do
+      objectManager.maxObjects = objectManager.maxObjects + 1
+      local type = GetObjectType(obj)
+      if type == Obj_AI_Camp then
+        objectManager.camps[_] = obj
+      elseif type == Obj_AI_Minion then
+        objectManager.minions[_] = obj
+      end
+    end
+  end)
+end
+
 OnLoop(function(myHero)
 if Comb.getValue() then 
 	DoCombo()
@@ -237,4 +260,65 @@ end
 
 function GetMyHeroPos()
     return GetOrigin(GetMyHero()) 
+end
+
+function CountMinions()
+    local m = 0
+    for _,k in pairs(GetAllMinions()) do 
+        m = m + 1 
+    end
+    return m
+end
+
+function GetAllMinions(team)
+    local result = {}
+    for _,k in pairs(objectManager.minions) do
+        if k and not IsDead(k) and GetCurrentHP(k) < 100000 and GetObjectName(k):find("_") then
+            if not team or GetTeam(k) == team then
+                result[_] = k
+            end
+        else
+            objectManager.minions[_] = nil
+        end
+    end
+    return result
+end
+
+function ClosestMinion(pos, team)
+    local minion = nil
+    for k,v in pairs(GetAllMinions(team)) do 
+      if v then
+        if not minion then minion = v end
+        if minion and GetDistanceSqr(GetOrigin(minion),pos) > GetDistanceSqr(GetOrigin(v),pos) then
+          minion = v
+        end
+      end
+    end
+    return minion
+end
+
+function GetLowestMinion(pos, range, team)
+    local minion = nil
+    for k,v in pairs(GetAllMinions(team)) do 
+      if v then
+        if not minion and GetDistanceSqr(GetOrigin(v),pos) < range*range then minion = v end
+        if minion and GetDistanceSqr(GetOrigin(v),pos) < range*range and GetCurrentHP(v) < GetCurrentHP(minion) then
+            minion = v
+        end
+      end
+    end
+    return minion
+end
+
+function GetHighestMinion(pos, range, team)
+    local minion = nil
+    for k,v in pairs(GetAllMinions(team)) do 
+      if v then
+        if not minion and GetDistanceSqr(GetOrigin(v),pos) < range*range then minion = v end
+        if minion and GetDistanceSqr(GetOrigin(v),pos) < range*range and GetCurrentHP(v) > GetCurrentHP(minion) then
+          minion = v
+        end
+      end
+    end
+    return minion
 end
