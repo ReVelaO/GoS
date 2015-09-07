@@ -1,5 +1,5 @@
 require('DLib')
-require('IAC')
+require('IOW')
 
 local root = menu.addItem(SubMenu.new("DarkRyze"))
 local Combo = root.addItem(SubMenu.new("Combo"))
@@ -35,24 +35,6 @@ local Drawings = root.addItem(SubMenu.new("Drawings"))
 	local DrawHD = Drawings.addItem(MenuSlider.new("Quality Circles (High Number More FPS)", 255, 1, 255, 1))
 	local Info = Drawings.addItem(MenuSeparator.new("If Drawings has not purple color then"))
 	local Info1 = Drawings.addItem(MenuSeparator.new("Press F6 x2"))
-
-DelayAction(function ()
-        for _, imenu in pairs(menuTable) do
-                local submenu = menu.addItem(SubMenu.new(imenu.name))
-                for _,subImenu in pairs(imenu) do
-                        if subImenu.type == SCRIPT_PARAM_ONOFF then
-                                local ChangeMenu = submenu.addItem(MenuBool.new(subImenu.t, subImenu.value))
-                                OnLoop(function(myHero) subImenu.value = ChangeMenu.getValue() end)
-                        elseif subImenu.type == SCRIPT_PARAM_KEYDOWN then
-                                local ChangeMenu = submenu.addItem(MenuKeyBind.new(subImenu.t, subImenu.key))
-                                OnLoop(function(myHero) subImenu.key = ChangeMenu.getValue(true) end)
-                        elseif subImenu.type == SCRIPT_PARAM_INFO then
-                                submenu.addItem(MenuSeparator.new(subImenu.t))
-                        end
-                end
-        end
-        _G.DrawMenu = function ( ... )  end
-end, 1000)
 	
 --Updated 5.17.               
 local Pasiva = "ryzepassivecharged"
