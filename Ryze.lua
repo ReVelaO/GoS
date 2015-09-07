@@ -15,8 +15,14 @@ local Farm = root.addItem(SubMenu.new("Farm"))
 	local useQ = LaneClear.addItem(MenuBool.new("Use Q",true))
 	local useW = LaneClear.addItem(MenuBool.new("Use W",true))
 	local useE = LaneClear.addItem(MenuBool.new("Use E",true))
-	local useR = LaneClear.addItem(MenuBool.new("Use R",true))
+	local useR = LaneClear.addItem(MenuBool.new("Use R",false))
 	local LClear = LaneClear.addItem(MenuKeyBind.new("Lane Clear", 86))
+	local JungleClear = Farm.addItem(SubMenu.new("Jungle Cear"))
+	local JuseQ = JungleClear.addItem(MenuBool.new("Use Q",true))
+	local JuseW = JungleClear.addItem(MenuBool.new("Use W",true))
+	local JuseE = JungleClear.addItem(MenuBool.new("Use E",true))
+	local JuseR = JungleClear.addItem(MenuBool.new("Use R",false))
+	local JClear = JungleClear.addItem(MenuKeyBind.new("Jungle Cear", 86))
 	
 local Misc = root.addItem(SubMenu.new("Misc"))
 	local ALS = Misc.addItem(MenuBool.new("Auto Level Spells",true))
@@ -56,6 +62,10 @@ if Comb.getValue() then
 if LClear.getValue() then
 	LaneClear()
 	end	
+	
+if JClear.getValue() then
+	JungleClear()
+	end		
 
 if	ALS.getValue() then
 	AutoLevelS()
@@ -112,6 +122,31 @@ if LClear.getValue() then
 						end 		
              
 						if CanUseSpell(myHero, _R) == READY and useR.getValue() and (GotBuff(myHero, "ryzepassivecharged") > 0) then
+						CastSpell(_R)			 
+						end
+          end
+       end
+    end    
+end
+
+function JungleClear()
+if JClear.getValue() then      
+                for i,minion in pairs(GetAllMinions(MINION_JUNGLE)) do    
+                        if IsInDistance(minion, 600) then
+                        local PMinion = GetOrigin(minion)
+						if CanUseSpell(myHero, _W) == READY and JuseW.getValue() then
+						CastTargetSpell(minion, _W)
+						end
+						
+						if CanUseSpell(myHero, _Q) == READY  and JuseQ.getValue() then
+						CastSkillShot(_Q,PMinion.x,PMinion.y,PMinion.z)
+						end		
+						
+						if CanUseSpell(myHero, _E) == READY and JuseE.getValue() then
+						CastTargetSpell(minion, _E)
+						end 		
+             
+						if CanUseSpell(myHero, _R) == READY and JuseR.getValue() and (GotBuff(myHero, "ryzepassivecharged") > 0) then
 						CastSpell(_R)			 
 						end
           end
