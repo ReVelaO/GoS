@@ -22,6 +22,7 @@ local Farm = root.addItem(SubMenu.new("Farm"))
 	local JuseW = JungleClear.addItem(MenuBool.new("Use W",true))
 	local JuseE = JungleClear.addItem(MenuBool.new("Use E",true))
 	local JuseR = JungleClear.addItem(MenuBool.new("Use R",false))
+	local JuseRR = JungleClear.addItem(MenuBool.new("Use Smart R",false))
 	local JClear = JungleClear.addItem(MenuKeyBind.new("Jungle Cear", 86))
 	
 local Misc = root.addItem(SubMenu.new("Misc"))
@@ -81,13 +82,17 @@ function DoCombo()
 if Comb.getValue() then 
 	local myHeroPos = GetOrigin(myHero)
 	local target = GetCurrentTarget()
+	
 	if ValidTarget(target, 900) then					
 		if CanUseSpell(myHero, _W) == READY and WU.getValue() then
 			CastTargetSpell(target, _W)
 			end                     	
 		
-		local QPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)		
-		if CanUseSpell(myHero, _Q) == READY and QPred.HitChance == 1 and QU.getValue() then
+		local QPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)
+		local ChampEnemy = GetOrigin(target)		
+		if CanUseSpell(myHero, _Q) == READY and (GotBuff(target , "RyzeW") == 1) and QU.getValue() then
+			CastSkillShot(_Q,ChampEnemy.x,ChampEnemy.y,ChampEnemy.z)						
+		elseif CanUseSpell(myHero, _Q) == READY and QPred.HitChance == 1 and QU.getValue() then
 			CastSkillShot(_Q,QPred.PredPos.x,QPred.PredPos.y,QPred.PredPos.z)						
 			end
 
@@ -148,7 +153,9 @@ if JClear.getValue() then
              
 						if CanUseSpell(myHero, _R) == READY and JuseR.getValue() and (GotBuff(myHero, "ryzepassivecharged") > 0) then
 						CastSpell(_R)			 
-						end
+						elseif CanUseSpell(myHero, _R) == READY and JuseRR.getValue() and (GotBuff(myHero, "ryzepassivecharged") > 0) and (GotBuff(minion , "RyzeW") == 1) then
+						CastSpell(_R)
+			end
           end
        end
     end    
