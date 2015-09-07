@@ -8,6 +8,7 @@ local Combo = root.addItem(SubMenu.new("Combo"))
 	local EU = Combo.addItem(MenuBool.new("Use E",true))
 	local RU = Combo.addItem(MenuBool.new("Use R",true))
 	local RRU = Combo.addItem(MenuBool.new("Use R if rooted",true))
+	local AA = Combo.addItem(MenuBool.new("Block Auto-Attacks in Combo",true))
 	local Comb = Combo.addItem(MenuKeyBind.new("Combo", 32))
 	
 local Farm = root.addItem(SubMenu.new("Farm"))
@@ -67,6 +68,10 @@ if Comb.getValue() then
 	DoCombo()
 	end
 
+if AA.getValue() then
+	IOW:DisableAutoAttacks()
+	end
+	
 if LClear.getValue() then
 	LaneClear()
 	end	
