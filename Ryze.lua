@@ -40,29 +40,6 @@ local Drawings = root.addItem(SubMenu.new("Drawings"))
 --Updated 5.17.               
 local Pasiva = "ryzepassivecharged"
 
-do
-  _G.objectManager = {}
-  objectManager.maxObjects = 0
-  objectManager.objects = {}
-  objectManager.camps = {}
-  objectManager.minions = {}
-  OnObjectLoop(function(object, myHero)
-    objectManager.objects[GetNetworkID(object)] = object
-  end)
-  OnLoop(function(myHero)
-    objectManager.maxObjects = 0
-    for _, obj in pairs(objectManager.objects) do
-      objectManager.maxObjects = objectManager.maxObjects + 1
-      local type = GetObjectType(obj)
-      if type == Obj_AI_Camp then
-        objectManager.camps[_] = obj
-      elseif type == Obj_AI_Minion then
-        objectManager.minions[_] = obj
-      end
-    end
-  end)
-end
-
 OnLoop(function(myHero)
 if Comb.getValue() then 
 	DoCombo()
@@ -88,20 +65,19 @@ end)
 
 function DoCombo()
 if Comb.getValue() then 
-	local myHeroPos = GetOrigin(myHero)
-	local target = GetCurrentTarget()
+	local target = IOW:GetTarget()
 	if AA.getValue() then IOW:DisableAutoAttacks() end
 			
-	if ValidTarget(target, 900) then					
+	if GoS:ValidTarget(target, 900) then					
 		if CanUseSpell(myHero, _W) == READY and WU.getValue() then
 			CastTargetSpell(target, _W)
 			end                     	
 		
-		local QPred = GetPredictionForPlayer(GetMyHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)
+		local QPred = GetPredictionForPlayer(GoS:myHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)
 		local ChampEnemy = GetOrigin(target)		
-		if CanUseSpell(myHero, _Q) == READY and (GotBuff(target , "RyzeW") == 1) and QU.getValue() then
+		if CanUseSpell(myHero, _Q) == READY and (GotBuff(target, "RyzeW") == 1) and QU.getValue() then
 			CastSkillShot(_Q,ChampEnemy.x,ChampEnemy.y,ChampEnemy.z)						
-		elseif CanUseSpell(myHero, _Q) == READY and QPred.HitChance == 1 and QU.getValue() then
+		elseif CanUseSpell(myHero, _Q) == READY and QPred.HitChance == 1 and not (GotBuff(target, "RyzeW") == 1) and QU.getValue() then
 			CastSkillShot(_Q,QPred.PredPos.x,QPred.PredPos.y,QPred.PredPos.z)						
 			end
 
@@ -120,8 +96,8 @@ end
 
 function LaneClear()
 if LClear.getValue() then      
-                for i,minion in pairs(GetAllMinions(MINION_ENEMY)) do    
-                        if IsInDistance(minion, 600) then
+                for i,minion in pairs(GoS:GetAllMinions(MINION_ENEMY)) do    
+                        if GoS:IsInDistance(minion, 600) then
                         local PMinion = GetOrigin(minion)
 						if CanUseSpell(myHero, _W) == READY and useW.getValue() then
 						CastTargetSpell(minion, _W)
@@ -145,8 +121,8 @@ end
 
 function JungleClear()
 if JClear.getValue() then      
-                for i,minion in pairs(GetAllMinions(MINION_JUNGLE)) do    
-                        if IsInDistance(minion, 600) then
+                for i,minion in pairs(GoS:GetAllMinions(MINION_JUNGLE)) do    
+                        if GoS:IsInDistance(minion, 600) then
                         local PMinion = GetOrigin(minion)
 						if CanUseSpell(myHero, _W) == READY and JuseW.getValue() then
 						CastTargetSpell(minion, _W)
@@ -217,110 +193,4 @@ if DrawQ.getValue() then
 if DrawWE.getValue() then
 	DrawCircle(GetOrigin(myHero),600,3,DrawHD.getValue(),0xff7B68EE)
 	end
-end
-
-function CalcDamage(source, target, addmg, apdmg)
-    local ADDmg = addmg or 0
-    local APDmg = apdmg or 0
-    local ArmorPen = math.floor(GetArmorPenFlat(source))
-    local ArmorPenPercent = math.floor(GetArmorPenPercent(source)*100)/100
-    local Armor = GetArmor(target)*ArmorPenPercent-ArmorPen
-    local ArmorPercent = Armor > 0 and math.floor(Armor*100/(100+Armor))/100 or math.ceil(Armor*100/(100-Armor))/100
-    local MagicPen = math.floor(GetMagicPenFlat(source))
-    local MagicPenPercent = math.floor(GetMagicPenPercent(source)*100)/100
-    local MagicArmor = GetMagicResist(target)*MagicPenPercent-MagicPen
-    local MagicArmorPercent = MagicArmor > 0 and math.floor(MagicArmor*100/(100+MagicArmor))/100 or math.ceil(MagicArmor*100/(100-MagicArmor))/100
-    return (GotBuff(source,"exhausted")  > 0 and 0.4 or 1) * math.floor(ADDmg*(1-ArmorPercent))+math.floor(APDmg*(1-MagicArmorPercent))
-end
-
-function GetEnemyHeroes()
-  local result = {}
-  for _, obj in pairs(objectManager.heroes) do
-    if GetTeam(obj) ~= GetTeam(GetMyHero()) then
-      table.insert(result, obj)
-    end
-  end
-  return result
-end
-
-function ValidTarget(unit, range)
-    range = range or 25000
-    if unit == nil or GetOrigin(unit) == nil or not IsTargetable(unit) or IsDead(unit) or not IsVisible(unit) or GetTeam(unit) == GetTeam(GetMyHero()) or not IsInDistance(unit, range) then return false end
-    return true
-end
-
-function IsInDistance(p1,r)
-    return GetDistanceSqr(GetOrigin(p1)) < r*r
-end
-
-function GetDistanceSqr(p1,p2)
-    p2 = p2 or GetMyHeroPos()
-    local dx = p1.x - p2.x
-    local dz = (p1.z or p1.y) - (p2.z or p2.y)
-    return dx*dx + dz*dz
-end
-
-function GetMyHeroPos()
-    return GetOrigin(GetMyHero()) 
-end
-
-function CountMinions()
-    local m = 0
-    for _,k in pairs(GetAllMinions()) do 
-        m = m + 1 
-    end
-    return m
-end
-
-function GetAllMinions(team)
-    local result = {}
-    for _,k in pairs(objectManager.minions) do
-        if k and not IsDead(k) and GetCurrentHP(k) < 100000 and GetObjectName(k):find("_") then
-            if not team or GetTeam(k) == team then
-                result[_] = k
-            end
-        else
-            objectManager.minions[_] = nil
-        end
-    end
-    return result
-end
-
-function ClosestMinion(pos, team)
-    local minion = nil
-    for k,v in pairs(GetAllMinions(team)) do 
-      if v then
-        if not minion then minion = v end
-        if minion and GetDistanceSqr(GetOrigin(minion),pos) > GetDistanceSqr(GetOrigin(v),pos) then
-          minion = v
-        end
-      end
-    end
-    return minion
-end
-
-function GetLowestMinion(pos, range, team)
-    local minion = nil
-    for k,v in pairs(GetAllMinions(team)) do 
-      if v then
-        if not minion and GetDistanceSqr(GetOrigin(v),pos) < range*range then minion = v end
-        if minion and GetDistanceSqr(GetOrigin(v),pos) < range*range and GetCurrentHP(v) < GetCurrentHP(minion) then
-            minion = v
-        end
-      end
-    end
-    return minion
-end
-
-function GetHighestMinion(pos, range, team)
-    local minion = nil
-    for k,v in pairs(GetAllMinions(team)) do 
-      if v then
-        if not minion and GetDistanceSqr(GetOrigin(v),pos) < range*range then minion = v end
-        if minion and GetDistanceSqr(GetOrigin(v),pos) < range*range and GetCurrentHP(v) > GetCurrentHP(minion) then
-          minion = v
-        end
-      end
-    end
-    return minion
 end
