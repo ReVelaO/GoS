@@ -1,67 +1,75 @@
 require('DLib')
 require('IOW')
 
-local root = menu.addItem(SubMenu.new("DarkRyze"))
-local Combo = root.addItem(SubMenu.new("Combo"))
-	local QU = Combo.addItem(MenuBool.new("Use Q",true))
-	local WU = Combo.addItem(MenuBool.new("Use W",true))
-	local EU = Combo.addItem(MenuBool.new("Use E",true))
-	local RU = Combo.addItem(MenuBool.new("Use R",true))
-	local RRU = Combo.addItem(MenuBool.new("Use R if rooted",true))
-	local Comb = Combo.addItem(MenuKeyBind.new("Combo", 32))
+supportedHero = {["Ryze"] = true}
+class "Ryze"
+
+function Ryze:__init()
+
+OnLoop(function(myHero) self:Loop(myHero) end)
+
+root = menu.addItem(SubMenu.new("DarkRyze"))
+Combo = root.addItem(SubMenu.new("Combo"))
+QU = Combo.addItem(MenuBool.new("Use Q",true))
+WU = Combo.addItem(MenuBool.new("Use W",true))
+EU = Combo.addItem(MenuBool.new("Use E",true))
+RU = Combo.addItem(MenuBool.new("Use R",true))
+RRU = Combo.addItem(MenuBool.new("Use R if rooted",true))
+Comb = Combo.addItem(MenuKeyBind.new("Combo", 32))
 	
-local Farm = root.addItem(SubMenu.new("Farm"))
-	local LaneClear = Farm.addItem(SubMenu.new("Lane Clear"))
-	local useQ = LaneClear.addItem(MenuBool.new("Use Q",true))
-	local useW = LaneClear.addItem(MenuBool.new("Use W",true))
-	local useE = LaneClear.addItem(MenuBool.new("Use E",true))
-	local useR = LaneClear.addItem(MenuBool.new("Use R",false))
-	local LClear = LaneClear.addItem(MenuKeyBind.new("Lane Clear", 86))
-	local JungleClear = Farm.addItem(SubMenu.new("Jungle Cear"))
-	local JuseQ = JungleClear.addItem(MenuBool.new("Use Q",true))
-	local JuseW = JungleClear.addItem(MenuBool.new("Use W",true))
-	local JuseE = JungleClear.addItem(MenuBool.new("Use E",true))
-	local JuseR = JungleClear.addItem(MenuBool.new("Use R",false))
-	local JClear = JungleClear.addItem(MenuKeyBind.new("Jungle Clear", 86))
+Farm = root.addItem(SubMenu.new("Farm"))
+LaneClear = Farm.addItem(SubMenu.new("Lane Clear"))
+useQ = LaneClear.addItem(MenuBool.new("Use Q",true))
+useW = LaneClear.addItem(MenuBool.new("Use W",true))
+useE = LaneClear.addItem(MenuBool.new("Use E",true))
+useR = LaneClear.addItem(MenuBool.new("Use R",false))
+LClear = LaneClear.addItem(MenuKeyBind.new("Lane Clear", 86))
+JungleClear = Farm.addItem(SubMenu.new("Jungle Cear"))
+JuseQ = JungleClear.addItem(MenuBool.new("Use Q",true))
+JuseW = JungleClear.addItem(MenuBool.new("Use W",true))
+JuseE = JungleClear.addItem(MenuBool.new("Use E",true))
+JuseR = JungleClear.addItem(MenuBool.new("Use R",false))
+JClear = JungleClear.addItem(MenuKeyBind.new("Jungle Clear", 86))
 	
-local Misc = root.addItem(SubMenu.new("Misc"))
-	local ALS = Misc.addItem(MenuBool.new("Auto Level Spells",true))
+Misc = root.addItem(SubMenu.new("Misc"))
+ALS = Misc.addItem(MenuBool.new("Auto Level Spells",true))
 	
-local Drawings = root.addItem(SubMenu.new("Drawings"))
-	local Enable = Drawings.addItem(MenuBool.new("Enable Drawings",true))
-	local DrawQ = Drawings.addItem(MenuBool.new("Draw Q Range",true))
-	local DrawWE = Drawings.addItem(MenuBool.new("Draw W + E Range",true))
-	local DrawHD = Drawings.addItem(MenuSlider.new("Quality Circles (High Number More FPS)", 255, 1, 255, 1))
-	local Info = Drawings.addItem(MenuSeparator.new("If Drawings has not purple color then"))
-	local Info1 = Drawings.addItem(MenuSeparator.new("Press F6 x2"))
+Drawings = root.addItem(SubMenu.new("Drawings"))
+Enable = Drawings.addItem(MenuBool.new("Enable Drawings",true))
+DrawQ = Drawings.addItem(MenuBool.new("Draw Q Range",true))
+DrawWE = Drawings.addItem(MenuBool.new("Draw W + E Range",true))
+DrawHD = Drawings.addItem(MenuSlider.new("Quality Circles (High Number More FPS)", 255, 1, 255, 1))
+Info = Drawings.addItem(MenuSeparator.new("If Drawings has not purple color then"))
+Info1 = Drawings.addItem(MenuSeparator.new("Press F6 x2"))
 	
+end
 --Updated 5.17.
 
-OnLoop(function(myHero)
-if Comb.getValue() then 
-	DoCombo1()
-	DoCombo2()
+function Ryze:Loop(myHero)
+if _G.Comb.getValue() then 
+	self:DoCombo1()
+	self:DoCombo2()
 	end
 
 if 	LClear.getValue() then
-	LaneClear()
+	self:LaneClear()
 	end	
 	
 if 	JClear.getValue() then
-	JungleClear()
+	self:JungleClear()
 	end		
 
 if	ALS.getValue() then
-	AutoLevelS()
+	self:AutoLevelS()
 	end
 
 if 	Enable.getValue() then
-	Drawings()
+	self:Drawings()
 	end
-end)
+end
 
 
-function DoCombo1()
+function Ryze:DoCombo1()
 if Comb.getValue() and GotBuff(myHero, "ryzepassivestacks") >= 2 then 
 	local target = IOW:GetTarget()
 			
@@ -91,7 +99,7 @@ if Comb.getValue() and GotBuff(myHero, "ryzepassivestacks") >= 2 then
 	end
 end
 
-function DoCombo2()
+function Ryze:DoCombo2()
 if Comb.getValue() and GotBuff(myHero, "ryzepassivestacks") <= 1 then 
 	local target = IOW:GetTarget()
 			
@@ -119,7 +127,7 @@ if Comb.getValue() and GotBuff(myHero, "ryzepassivestacks") <= 1 then
 	end
 end
 
-function LaneClear()
+function Ryze:LaneClear()
 if LClear.getValue() then      
                 for i,minion in pairs(GoS:GetAllMinions(MINION_ENEMY)) do    
                         if GoS:IsInDistance(minion, 600) then
@@ -144,7 +152,7 @@ if LClear.getValue() then
     end    
 end
 
-function JungleClear()
+function Ryze:JungleClear()
 if JClear.getValue() then      
                 for i,minion in pairs(GoS:GetAllMinions(MINION_JUNGLE)) do    
                         if GoS:IsInDistance(minion, 600) then
@@ -169,7 +177,7 @@ if JClear.getValue() then
 	end    
 end
 
-function AutoLevelS()
+function Ryze:AutoLevelS()
 if GetLevel(myHero) == 1 then
 	LevelSpell(_Q)
 elseif GetLevel(myHero) == 2 then
@@ -209,11 +217,17 @@ elseif GetLevel(myHero) == 18 then
 end
 end
 
-function Drawings()
+function Ryze:Drawings()
 if DrawQ.getValue() then
 	DrawCircle(GetOrigin(myHero),895,3,DrawHD.getValue(),0xff7B68EE)
 	end
 if DrawWE.getValue() then
 	DrawCircle(GetOrigin(myHero),600,3,DrawHD.getValue(),0xff7B68EE)
 	end
+end
+
+if supportedHero[GetObjectName(myHero)] == true then
+if _G[GetObjectName(myHero)] then
+  _G[GetObjectName(myHero)]()
+end 
 end
