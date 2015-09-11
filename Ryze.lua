@@ -22,7 +22,7 @@ local Farm = root.addItem(SubMenu.new("Farm"))
 	local JuseW = JungleClear.addItem(MenuBool.new("Use W",true))
 	local JuseE = JungleClear.addItem(MenuBool.new("Use E",true))
 	local JuseR = JungleClear.addItem(MenuBool.new("Use R",false))
-	local JClear = JungleClear.addItem(MenuKeyBind.new("Jungle Cear", 86))
+	local JClear = JungleClear.addItem(MenuKeyBind.new("Jungle Clear", 86))
 	
 local Misc = root.addItem(SubMenu.new("Misc"))
 	local ALS = Misc.addItem(MenuBool.new("Auto Level Spells",true))
