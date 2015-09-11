@@ -22,7 +22,6 @@ local Farm = root.addItem(SubMenu.new("Farm"))
 	local JuseW = JungleClear.addItem(MenuBool.new("Use W",true))
 	local JuseE = JungleClear.addItem(MenuBool.new("Use E",true))
 	local JuseR = JungleClear.addItem(MenuBool.new("Use R",false))
-	local JuseRR = JungleClear.addItem(MenuBool.new("Use Smart R",false))
 	local JClear = JungleClear.addItem(MenuKeyBind.new("Jungle Cear", 86))
 	
 local Misc = root.addItem(SubMenu.new("Misc"))
@@ -119,8 +118,6 @@ if Comb.getValue() then
 
 		if CanUseSpell(myHero, _R) == READY and RU.getValue() then
 			CastSpell(_R)
-		elseif CanUseSpell(myHero, _R) == READY and RRU.getValue() and (GotBuff(target , "RyzeW") == 1) then
-			CastSpell(_R)
 			end
 		end
 	end
@@ -170,12 +167,10 @@ if JClear.getValue() then
              
 						if CanUseSpell(myHero, _R) == READY and JuseR.getValue() and (GotBuff(myHero, "ryzepassivecharged") > 0) then
 						CastSpell(_R)			 
-						elseif CanUseSpell(myHero, _R) == READY and JuseRR.getValue() and (GotBuff(myHero, "ryzepassivecharged") > 0) and (GotBuff(minion , "RyzeW") == 1) then
-						CastSpell(_R)
-			end
-          end
-       end
-    end    
+						end
+          		end
+       		end
+	end    
 end
 
 function AutoLevelS()
