@@ -1,196 +1,56 @@
-require('DLib')
-require('IOW')
+require('math')
 
-local root = menu.addItem(SubMenu.new("DarkRyze"))
-local Combo = root.addItem(SubMenu.new("Combo"))
-	local QU = Combo.addItem(MenuBool.new("Use Q",true))
-	local WU = Combo.addItem(MenuBool.new("Use W",true))
-	local EU = Combo.addItem(MenuBool.new("Use E",true))
-	local RU = Combo.addItem(MenuBool.new("Use R",true))
-	local RRU = Combo.addItem(MenuBool.new("Use R if rooted",true))
-	local AA = Combo.addItem(MenuBool.new("Block Auto-Attacks in Combo",true))
-	local Comb = Combo.addItem(MenuKeyBind.new("Combo", 32))
-	
-local Farm = root.addItem(SubMenu.new("Farm"))
-	local LaneClear = Farm.addItem(SubMenu.new("Lane Clear"))
-	local useQ = LaneClear.addItem(MenuBool.new("Use Q",true))
-	local useW = LaneClear.addItem(MenuBool.new("Use W",true))
-	local useE = LaneClear.addItem(MenuBool.new("Use E",true))
-	local useR = LaneClear.addItem(MenuBool.new("Use R",false))
-	local LClear = LaneClear.addItem(MenuKeyBind.new("Lane Clear", 86))
-	local JungleClear = Farm.addItem(SubMenu.new("Jungle Cear"))
-	local JuseQ = JungleClear.addItem(MenuBool.new("Use Q",true))
-	local JuseW = JungleClear.addItem(MenuBool.new("Use W",true))
-	local JuseE = JungleClear.addItem(MenuBool.new("Use E",true))
-	local JuseR = JungleClear.addItem(MenuBool.new("Use R",false))
-	local JuseRR = JungleClear.addItem(MenuBool.new("Use Smart R",false))
-	local JClear = JungleClear.addItem(MenuKeyBind.new("Jungle Cear", 86))
-	
-local Misc = root.addItem(SubMenu.new("Misc"))
-	local ALS = Misc.addItem(MenuBool.new("Auto Level Spells",true))
-	
-local Drawings = root.addItem(SubMenu.new("Drawings"))
-	local Enable = Drawings.addItem(MenuBool.new("Enable Drawings",true))
-	local DrawQ = Drawings.addItem(MenuBool.new("Draw Q Range",true))
-	local DrawWE = Drawings.addItem(MenuBool.new("Draw W + E Range",true))
-	local DrawHD = Drawings.addItem(MenuSlider.new("Quality Circles (High Number More FPS)", 255, 1, 255, 1))
-	local Info = Drawings.addItem(MenuSeparator.new("If Drawings has not purple color then"))
-	local Info1 = Drawings.addItem(MenuSeparator.new("Press F6 x2"))
-	
---Updated 5.17.               
-local Pasiva = "ryzepassivecharged"
-
-OnLoop(function(myHero)
-if Comb.getValue() then 
-	DoCombo()
-	end
-
-if LClear.getValue() then
-	LaneClear()
-	end	
-	
-if JClear.getValue() then
-	JungleClear()
-	end		
-
-if	ALS.getValue() then
-	AutoLevelS()
-	end
-
-if Enable.getValue() then
-	Drawings()
-	end
-end)
+local index_table = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
 
 
-function DoCombo()
-if Comb.getValue() then 
-	local target = IOW:GetTarget()
-	if AA.getValue() then IOW:DisableAutoAttacks() end
-			
-	if GoS:ValidTarget(target, 900) then					
-		if CanUseSpell(myHero, _W) == READY and WU.getValue() then
-			CastTargetSpell(target, _W)
-			end                     	
-		
-		local QPred = GetPredictionForPlayer(GoS:myHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)
-		local ChampEnemy = GetOrigin(target)		
-		if CanUseSpell(myHero, _Q) == READY and (GotBuff(target, "RyzeW") == 1) and QU.getValue() then
-			CastSkillShot(_Q,ChampEnemy.x,ChampEnemy.y,ChampEnemy.z)						
-		elseif CanUseSpell(myHero, _Q) == READY and QPred.HitChance == 1 and not (GotBuff(target, "RyzeW") == 1) and QU.getValue() then
-			CastSkillShot(_Q,QPred.PredPos.x,QPred.PredPos.y,QPred.PredPos.z)						
-			end
+function to_binary(integer)
+    local remaining = tonumber(integer)
+    local bin_bits = ''
 
-		if CanUseSpell(myHero, _E) == READY and EU.getValue() then
-			CastTargetSpell(target, _E)
-			end
+    for i = 7, 0, -1 do
+        local current_power = math.pow(2, i)
 
-		if CanUseSpell(myHero, _R) == READY and RU.getValue() and (GotBuff(myHero, "ryzepassivecharged") > 0) then
-			CastSpell(_R)
-		elseif CanUseSpell(myHero, _R) == READY and RRU.getValue() and (GotBuff(myHero, "ryzepassivecharged") > 0) and (GotBuff(target , "RyzeW") == 1) then
-			CastSpell(_R)
-			end
-		end
-	end
+        if remaining >= current_power then
+            bin_bits = bin_bits .. '1'
+            remaining = remaining - current_power
+        else
+            bin_bits = bin_bits .. '0'
+        end
+    end
+
+    return bin_bits
 end
 
-function LaneClear()
-if LClear.getValue() then      
-                for i,minion in pairs(GoS:GetAllMinions(MINION_ENEMY)) do    
-                        if GoS:IsInDistance(minion, 600) then
-                        local PMinion = GetOrigin(minion)
-						if CanUseSpell(myHero, _W) == READY and useW.getValue() then
-						CastTargetSpell(minion, _W)
-						end
-						
-						if CanUseSpell(myHero, _Q) == READY  and useQ.getValue() then
-						CastSkillShot(_Q,PMinion.x,PMinion.y,PMinion.z)
-						end		
-						
-						if CanUseSpell(myHero, _E) == READY and useE.getValue() then
-						CastTargetSpell(minion, _E)
-						end 		
-             
-						if CanUseSpell(myHero, _R) == READY and useR.getValue() and (GotBuff(myHero, "ryzepassivecharged") > 0) then
-						CastSpell(_R)			 
-						end
-          end
-       end
-    end    
+function from_binary(bin_bits)
+    return tonumber(bin_bits, 2)
 end
 
-function JungleClear()
-if JClear.getValue() then      
-                for i,minion in pairs(GoS:GetAllMinions(MINION_JUNGLE)) do    
-                        if GoS:IsInDistance(minion, 600) then
-                        local PMinion = GetOrigin(minion)
-						if CanUseSpell(myHero, _W) == READY and JuseW.getValue() then
-						CastTargetSpell(minion, _W)
-						end
-						
-						if CanUseSpell(myHero, _Q) == READY  and JuseQ.getValue() then
-						CastSkillShot(_Q,PMinion.x,PMinion.y,PMinion.z)
-						end		
-						
-						if CanUseSpell(myHero, _E) == READY and JuseE.getValue() then
-						CastTargetSpell(minion, _E)
-						end 		
-             
-						if CanUseSpell(myHero, _R) == READY and JuseR.getValue() and (GotBuff(myHero, "ryzepassivecharged") > 0) then
-						CastSpell(_R)			 
-						elseif CanUseSpell(myHero, _R) == READY and JuseRR.getValue() and (GotBuff(myHero, "ryzepassivecharged") > 0) and (GotBuff(minion , "RyzeW") == 1) then
-						CastSpell(_R)
-			end
-          end
-       end
-    end    
-end
+function SSLDecode(to_decode)
+    local padded = to_decode:gsub("%s", "")
+    local unpadded = padded:gsub("=", "")
+    local bit_pattern = ''
+    local decoded = ''
 
-function AutoLevelS()
-if GetLevel(myHero) == 1 then
-	LevelSpell(_Q)
-elseif GetLevel(myHero) == 2 then
-	LevelSpell(_W)
-elseif GetLevel(myHero) == 3 then
-	LevelSpell(_E)
-elseif GetLevel(myHero) == 4 then
-        LevelSpell(_Q)
-elseif GetLevel(myHero) == 5 then
-        LevelSpell(_W)
-elseif GetLevel(myHero) == 6 then
-	LevelSpell(_R)
-elseif GetLevel(myHero) == 7 then
-	LevelSpell(_Q)
-elseif GetLevel(myHero) == 8 then
-        LevelSpell(_Q)
-elseif GetLevel(myHero) == 9 then
-        LevelSpell(_Q)
-elseif GetLevel(myHero) == 10 then
-        LevelSpell(_W)
-elseif GetLevel(myHero) == 11 then
-        LevelSpell(_R)
-elseif GetLevel(myHero) == 12 then
-        LevelSpell(_W)
-elseif GetLevel(myHero) == 13 then
-        LevelSpell(_E)
-elseif GetLevel(myHero) == 14 then
-        LevelSpell(_W)
-elseif GetLevel(myHero) == 15 then
-        LevelSpell(_E)
-elseif GetLevel(myHero) == 16 then
-        LevelSpell(_R)
-elseif GetLevel(myHero) == 17 then
-        LevelSpell(_E)
-elseif GetLevel(myHero) == 18 then
-        LevelSpell(_E)
-end
-end
+    for i = 1, string.len(unpadded) do
+        local char = string.sub(to_decode, i, i)
+        local offset, _ = string.find(index_table, char)
+        if offset == nil then
+            PrintChat("Invalid character '" .. char .. "' found.")
+        end
 
-function Drawings()
-if DrawQ.getValue() then
-	DrawCircle(GetOrigin(myHero),895,3,DrawHD.getValue(),0xff7B68EE)
-	end
-if DrawWE.getValue() then
-	DrawCircle(GetOrigin(myHero),600,3,DrawHD.getValue(),0xff7B68EE)
-	end
+        bit_pattern = bit_pattern .. string.sub(to_binary(offset-1), 3)
+    end
+
+    for i = 1, string.len(bit_pattern), 8 do
+        local byte = string.sub(bit_pattern, i, i+7)
+        decoded = decoded .. string.char(from_binary(byte))
+    end
+
+    local padding_length = padded:len()-unpadded:len()
+
+    if (padding_length == 1 or padding_length == 2) then
+        decoded = decoded:sub(1,-2)
+    end
+    return decoded
 end
+assert(loadstring(SSLDecode("cmVxdWlyZSgnRExpYicpDQpyZXF1aXJlKCdJT1cnKQ0KDQpsb2NhbCByb290ID0gbWVudS5hZGRJdGVtKFN1Yk1lbnUubmV3KCJEYXJrUnl6ZSIpKQ0KbG9jYWwgQ29tYm8gPSByb290LmFkZEl0ZW0oU3ViTWVudS5uZXcoIkNvbWJvIikpDQoJbG9jYWwgUVUgPSBDb21iby5hZGRJdGVtKE1lbnVCb29sLm5ldygiVXNlIFEiLHRydWUpKQ0KCWxvY2FsIFdVID0gQ29tYm8uYWRkSXRlbShNZW51Qm9vbC5uZXcoIlVzZSBXIix0cnVlKSkNCglsb2NhbCBFVSA9IENvbWJvLmFkZEl0ZW0oTWVudUJvb2wubmV3KCJVc2UgRSIsdHJ1ZSkpDQoJbG9jYWwgUlUgPSBDb21iby5hZGRJdGVtKE1lbnVCb29sLm5ldygiVXNlIFIiLHRydWUpKQ0KCWxvY2FsIFJSVSA9IENvbWJvLmFkZEl0ZW0oTWVudUJvb2wubmV3KCJVc2UgUiBpZiByb290ZWQiLHRydWUpKQ0KCWxvY2FsIEFBID0gQ29tYm8uYWRkSXRlbShNZW51Qm9vbC5uZXcoIkJsb2NrIEF1dG8tQXR0YWNrcyBpbiBDb21ibyIsdHJ1ZSkpDQoJbG9jYWwgQ29tYiA9IENvbWJvLmFkZEl0ZW0oTWVudUtleUJpbmQubmV3KCJDb21ibyIsIDMyKSkNCgkNCmxvY2FsIEZhcm0gPSByb290LmFkZEl0ZW0oU3ViTWVudS5uZXcoIkZhcm0iKSkNCglsb2NhbCBMYW5lQ2xlYXIgPSBGYXJtLmFkZEl0ZW0oU3ViTWVudS5uZXcoIkxhbmUgQ2xlYXIiKSkNCglsb2NhbCB1c2VRID0gTGFuZUNsZWFyLmFkZEl0ZW0oTWVudUJvb2wubmV3KCJVc2UgUSIsdHJ1ZSkpDQoJbG9jYWwgdXNlVyA9IExhbmVDbGVhci5hZGRJdGVtKE1lbnVCb29sLm5ldygiVXNlIFciLHRydWUpKQ0KCWxvY2FsIHVzZUUgPSBMYW5lQ2xlYXIuYWRkSXRlbShNZW51Qm9vbC5uZXcoIlVzZSBFIix0cnVlKSkNCglsb2NhbCB1c2VSID0gTGFuZUNsZWFyLmFkZEl0ZW0oTWVudUJvb2wubmV3KCJVc2UgUiIsZmFsc2UpKQ0KCWxvY2FsIExDbGVhciA9IExhbmVDbGVhci5hZGRJdGVtKE1lbnVLZXlCaW5kLm5ldygiTGFuZSBDbGVhciIsIDg2KSkNCglsb2NhbCBKdW5nbGVDbGVhciA9IEZhcm0uYWRkSXRlbShTdWJNZW51Lm5ldygiSnVuZ2xlIENlYXIiKSkNCglsb2NhbCBKdXNlUSA9IEp1bmdsZUNsZWFyLmFkZEl0ZW0oTWVudUJvb2wubmV3KCJVc2UgUSIsdHJ1ZSkpDQoJbG9jYWwgSnVzZVcgPSBKdW5nbGVDbGVhci5hZGRJdGVtKE1lbnVCb29sLm5ldygiVXNlIFciLHRydWUpKQ0KCWxvY2FsIEp1c2VFID0gSnVuZ2xlQ2xlYXIuYWRkSXRlbShNZW51Qm9vbC5uZXcoIlVzZSBFIix0cnVlKSkNCglsb2NhbCBKdXNlUiA9IEp1bmdsZUNsZWFyLmFkZEl0ZW0oTWVudUJvb2wubmV3KCJVc2UgUiIsZmFsc2UpKQ0KCWxvY2FsIEp1c2VSUiA9IEp1bmdsZUNsZWFyLmFkZEl0ZW0oTWVudUJvb2wubmV3KCJVc2UgU21hcnQgUiIsZmFsc2UpKQ0KCWxvY2FsIEpDbGVhciA9IEp1bmdsZUNsZWFyLmFkZEl0ZW0oTWVudUtleUJpbmQubmV3KCJKdW5nbGUgQ2VhciIsIDg2KSkNCgkNCmxvY2FsIE1pc2MgPSByb290LmFkZEl0ZW0oU3ViTWVudS5uZXcoIk1pc2MiKSkNCglsb2NhbCBBTFMgPSBNaXNjLmFkZEl0ZW0oTWVudUJvb2wubmV3KCJBdXRvIExldmVsIFNwZWxscyIsdHJ1ZSkpDQoJDQpsb2NhbCBEcmF3aW5ncyA9IHJvb3QuYWRkSXRlbShTdWJNZW51Lm5ldygiRHJhd2luZ3MiKSkNCglsb2NhbCBFbmFibGUgPSBEcmF3aW5ncy5hZGRJdGVtKE1lbnVCb29sLm5ldygiRW5hYmxlIERyYXdpbmdzIix0cnVlKSkNCglsb2NhbCBEcmF3USA9IERyYXdpbmdzLmFkZEl0ZW0oTWVudUJvb2wubmV3KCJEcmF3IFEgUmFuZ2UiLHRydWUpKQ0KCWxvY2FsIERyYXdXRSA9IERyYXdpbmdzLmFkZEl0ZW0oTWVudUJvb2wubmV3KCJEcmF3IFcgKyBFIFJhbmdlIix0cnVlKSkNCglsb2NhbCBEcmF3SEQgPSBEcmF3aW5ncy5hZGRJdGVtKE1lbnVTbGlkZXIubmV3KCJRdWFsaXR5IENpcmNsZXMgKEhpZ2ggTnVtYmVyIE1vcmUgRlBTKSIsIDI1NSwgMSwgMjU1LCAxKSkNCglsb2NhbCBJbmZvID0gRHJhd2luZ3MuYWRkSXRlbShNZW51U2VwYXJhdG9yLm5ldygiSWYgRHJhd2luZ3MgaGFzIG5vdCBwdXJwbGUgY29sb3IgdGhlbiIpKQ0KCWxvY2FsIEluZm8xID0gRHJhd2luZ3MuYWRkSXRlbShNZW51U2VwYXJhdG9yLm5ldygiUHJlc3MgRjYgeDIiKSkNCgkNCi0tVXBkYXRlZCA1LjE3LiAgICAgICAgICAgICAgIA0KbG9jYWwgUGFzaXZhID0gInJ5emVwYXNzaXZlY2hhcmdlZCINCg0KT25Mb29wKGZ1bmN0aW9uKG15SGVybykNCmlmIENvbWIuZ2V0VmFsdWUoKSB0aGVuIA0KCURvQ29tYm8oKQ0KCWVuZA0KDQppZiBMQ2xlYXIuZ2V0VmFsdWUoKSB0aGVuDQoJTGFuZUNsZWFyKCkNCgllbmQJDQoJDQppZiBKQ2xlYXIuZ2V0VmFsdWUoKSB0aGVuDQoJSnVuZ2xlQ2xlYXIoKQ0KCWVuZAkJDQoNCmlmCUFMUy5nZXRWYWx1ZSgpIHRoZW4NCglBdXRvTGV2ZWxTKCkNCgllbmQNCg0KaWYgRW5hYmxlLmdldFZhbHVlKCkgdGhlbg0KCURyYXdpbmdzKCkNCgllbmQNCmVuZCkNCg0KDQpmdW5jdGlvbiBEb0NvbWJvKCkNCmlmIENvbWIuZ2V0VmFsdWUoKSB0aGVuIA0KCWxvY2FsIHRhcmdldCA9IElPVzpHZXRUYXJnZXQoKQ0KCWlmIEFBLmdldFZhbHVlKCkgdGhlbiBJT1c6RGlzYWJsZUF1dG9BdHRhY2tzKCkgZW5kDQoJCQkNCglpZiBHb1M6VmFsaWRUYXJnZXQodGFyZ2V0LCA5MDApIHRoZW4JCQkJCQ0KCQlpZiBDYW5Vc2VTcGVsbChteUhlcm8sIF9XKSA9PSBSRUFEWSBhbmQgV1UuZ2V0VmFsdWUoKSB0aGVuDQoJCQlDYXN0VGFyZ2V0U3BlbGwodGFyZ2V0LCBfVykNCgkJCWVuZCAgICAgICAgICAgICAgICAgICAgIAkNCgkJDQoJCWxvY2FsIFFQcmVkID0gR2V0UHJlZGljdGlvbkZvclBsYXllcihHb1M6bXlIZXJvUG9zKCksdGFyZ2V0LEdldE1vdmVTcGVlZCh0YXJnZXQpLDkwMCwyNTAsR2V0Q2FzdFJhbmdlKG15SGVybyxfUSksNTUsZmFsc2UsdHJ1ZSkNCgkJbG9jYWwgQ2hhbXBFbmVteSA9IEdldE9yaWdpbih0YXJnZXQpCQkNCgkJaWYgQ2FuVXNlU3BlbGwobXlIZXJvLCBfUSkgPT0gUkVBRFkgYW5kIChHb3RCdWZmKHRhcmdldCwgIlJ5emVXIikgPT0gMSkgYW5kIFFVLmdldFZhbHVlKCkgdGhlbg0KCQkJQ2FzdFNraWxsU2hvdChfUSxDaGFtcEVuZW15LngsQ2hhbXBFbmVteS55LENoYW1wRW5lbXkueikJCQkJCQkNCgkJZWxzZWlmIENhblVzZVNwZWxsKG15SGVybywgX1EpID09IFJFQURZIGFuZCBRUHJlZC5IaXRDaGFuY2UgPT0gMSBhbmQgbm90IChHb3RCdWZmKHRhcmdldCwgIlJ5emVXIikgPT0gMSkgYW5kIFFVLmdldFZhbHVlKCkgdGhlbg0KCQkJQ2FzdFNraWxsU2hvdChfUSxRUHJlZC5QcmVkUG9zLngsUVByZWQuUHJlZFBvcy55LFFQcmVkLlByZWRQb3MueikJCQkJCQkNCgkJCWVuZA0KDQoJCWlmIENhblVzZVNwZWxsKG15SGVybywgX0UpID09IFJFQURZIGFuZCBFVS5nZXRWYWx1ZSgpIHRoZW4NCgkJCUNhc3RUYXJnZXRTcGVsbCh0YXJnZXQsIF9FKQ0KCQkJZW5kDQoNCgkJaWYgQ2FuVXNlU3BlbGwobXlIZXJvLCBfUikgPT0gUkVBRFkgYW5kIFJVLmdldFZhbHVlKCkgYW5kIChHb3RCdWZmKG15SGVybywgInJ5emVwYXNzaXZlY2hhcmdlZCIpID4gMCkgdGhlbg0KCQkJQ2FzdFNwZWxsKF9SKQ0KCQllbHNlaWYgQ2FuVXNlU3BlbGwobXlIZXJvLCBfUikgPT0gUkVBRFkgYW5kIFJSVS5nZXRWYWx1ZSgpIGFuZCAoR290QnVmZihteUhlcm8sICJyeXplcGFzc2l2ZWNoYXJnZWQiKSA+IDApIGFuZCAoR290QnVmZih0YXJnZXQgLCAiUnl6ZVciKSA9PSAxKSB0aGVuDQoJCQlDYXN0U3BlbGwoX1IpDQoJCQllbmQNCgkJZW5kDQoJZW5kDQplbmQNCg0KZnVuY3Rpb24gTGFuZUNsZWFyKCkNCmlmIExDbGVhci5nZXRWYWx1ZSgpIHRoZW4gICAgICANCiAgICAgICAgICAgICAgICBmb3IgaSxtaW5pb24gaW4gcGFpcnMoR29TOkdldEFsbE1pbmlvbnMoTUlOSU9OX0VORU1ZKSkgZG8gICAgDQogICAgICAgICAgICAgICAgICAgICAgICBpZiBHb1M6SXNJbkRpc3RhbmNlKG1pbmlvbiwgNjAwKSB0aGVuDQogICAgICAgICAgICAgICAgICAgICAgICBsb2NhbCBQTWluaW9uID0gR2V0T3JpZ2luKG1pbmlvbikNCgkJCQkJCWlmIENhblVzZVNwZWxsKG15SGVybywgX1cpID09IFJFQURZIGFuZCB1c2VXLmdldFZhbHVlKCkgdGhlbg0KCQkJCQkJQ2FzdFRhcmdldFNwZWxsKG1pbmlvbiwgX1cpDQoJCQkJCQllbmQNCgkJCQkJCQ0KCQkJCQkJaWYgQ2FuVXNlU3BlbGwobXlIZXJvLCBfUSkgPT0gUkVBRFkgIGFuZCB1c2VRLmdldFZhbHVlKCkgdGhlbg0KCQkJCQkJQ2FzdFNraWxsU2hvdChfUSxQTWluaW9uLngsUE1pbmlvbi55LFBNaW5pb24ueikNCgkJCQkJCWVuZAkJDQoJCQkJCQkNCgkJCQkJCWlmIENhblVzZVNwZWxsKG15SGVybywgX0UpID09IFJFQURZIGFuZCB1c2VFLmdldFZhbHVlKCkgdGhlbg0KCQkJCQkJQ2FzdFRhcmdldFNwZWxsKG1pbmlvbiwgX0UpDQoJCQkJCQllbmQgCQkNCiAgICAgICAgICAgICANCgkJCQkJCWlmIENhblVzZVNwZWxsKG15SGVybywgX1IpID09IFJFQURZIGFuZCB1c2VSLmdldFZhbHVlKCkgYW5kIChHb3RCdWZmKG15SGVybywgInJ5emVwYXNzaXZlY2hhcmdlZCIpID4gMCkgdGhlbg0KCQkJCQkJQ2FzdFNwZWxsKF9SKQkJCSANCgkJCQkJCWVuZA0KICAgICAgICAgIGVuZA0KICAgICAgIGVuZA0KICAgIGVuZCAgICANCmVuZA0KDQpmdW5jdGlvbiBKdW5nbGVDbGVhcigpDQppZiBKQ2xlYXIuZ2V0VmFsdWUoKSB0aGVuICAgICAgDQogICAgICAgICAgICAgICAgZm9yIGksbWluaW9uIGluIHBhaXJzKEdvUzpHZXRBbGxNaW5pb25zKE1JTklPTl9KVU5HTEUpKSBkbyAgICANCiAgICAgICAgICAgICAgICAgICAgICAgIGlmIEdvUzpJc0luRGlzdGFuY2UobWluaW9uLCA2MDApIHRoZW4NCiAgICAgICAgICAgICAgICAgICAgICAgIGxvY2FsIFBNaW5pb24gPSBHZXRPcmlnaW4obWluaW9uKQ0KCQkJCQkJaWYgQ2FuVXNlU3BlbGwobXlIZXJvLCBfVykgPT0gUkVBRFkgYW5kIEp1c2VXLmdldFZhbHVlKCkgdGhlbg0KCQkJCQkJQ2FzdFRhcmdldFNwZWxsKG1pbmlvbiwgX1cpDQoJCQkJCQllbmQNCgkJCQkJCQ0KCQkJCQkJaWYgQ2FuVXNlU3BlbGwobXlIZXJvLCBfUSkgPT0gUkVBRFkgIGFuZCBKdXNlUS5nZXRWYWx1ZSgpIHRoZW4NCgkJCQkJCUNhc3RTa2lsbFNob3QoX1EsUE1pbmlvbi54LFBNaW5pb24ueSxQTWluaW9uLnopDQoJCQkJCQllbmQJCQ0KCQkJCQkJDQoJCQkJCQlpZiBDYW5Vc2VTcGVsbChteUhlcm8sIF9FKSA9PSBSRUFEWSBhbmQgSnVzZUUuZ2V0VmFsdWUoKSB0aGVuDQoJCQkJCQlDYXN0VGFyZ2V0U3BlbGwobWluaW9uLCBfRSkNCgkJCQkJCWVuZCAJCQ0KICAgICAgICAgICAgIA0KCQkJCQkJaWYgQ2FuVXNlU3BlbGwobXlIZXJvLCBfUikgPT0gUkVBRFkgYW5kIEp1c2VSLmdldFZhbHVlKCkgYW5kIChHb3RCdWZmKG15SGVybywgInJ5emVwYXNzaXZlY2hhcmdlZCIpID4gMCkgdGhlbg0KCQkJCQkJQ2FzdFNwZWxsKF9SKQkJCSANCgkJCQkJCWVsc2VpZiBDYW5Vc2VTcGVsbChteUhlcm8sIF9SKSA9PSBSRUFEWSBhbmQgSnVzZVJSLmdldFZhbHVlKCkgYW5kIChHb3RCdWZmKG15SGVybywgInJ5emVwYXNzaXZlY2hhcmdlZCIpID4gMCkgYW5kIChHb3RCdWZmKG1pbmlvbiAsICJSeXplVyIpID09IDEpIHRoZW4NCgkJCQkJCUNhc3RTcGVsbChfUikNCgkJCWVuZA0KICAgICAgICAgIGVuZA0KICAgICAgIGVuZA0KICAgIGVuZCAgICANCmVuZA0KDQpmdW5jdGlvbiBBdXRvTGV2ZWxTKCkNCmlmIEdldExldmVsKG15SGVybykgPT0gMSB0aGVuDQoJTGV2ZWxTcGVsbChfUSkNCmVsc2VpZiBHZXRMZXZlbChteUhlcm8pID09IDIgdGhlbg0KCUxldmVsU3BlbGwoX1cpDQplbHNlaWYgR2V0TGV2ZWwobXlIZXJvKSA9PSAzIHRoZW4NCglMZXZlbFNwZWxsKF9FKQ0KZWxzZWlmIEdldExldmVsKG15SGVybykgPT0gNCB0aGVuDQogICAgICAgIExldmVsU3BlbGwoX1EpDQplbHNlaWYgR2V0TGV2ZWwobXlIZXJvKSA9PSA1IHRoZW4NCiAgICAgICAgTGV2ZWxTcGVsbChfVykNCmVsc2VpZiBHZXRMZXZlbChteUhlcm8pID09IDYgdGhlbg0KCUxldmVsU3BlbGwoX1IpDQplbHNlaWYgR2V0TGV2ZWwobXlIZXJvKSA9PSA3IHRoZW4NCglMZXZlbFNwZWxsKF9RKQ0KZWxzZWlmIEdldExldmVsKG15SGVybykgPT0gOCB0aGVuDQogICAgICAgIExldmVsU3BlbGwoX1EpDQplbHNlaWYgR2V0TGV2ZWwobXlIZXJvKSA9PSA5IHRoZW4NCiAgICAgICAgTGV2ZWxTcGVsbChfUSkNCmVsc2VpZiBHZXRMZXZlbChteUhlcm8pID09IDEwIHRoZW4NCiAgICAgICAgTGV2ZWxTcGVsbChfVykNCmVsc2VpZiBHZXRMZXZlbChteUhlcm8pID09IDExIHRoZW4NCiAgICAgICAgTGV2ZWxTcGVsbChfUikNCmVsc2VpZiBHZXRMZXZlbChteUhlcm8pID09IDEyIHRoZW4NCiAgICAgICAgTGV2ZWxTcGVsbChfVykNCmVsc2VpZiBHZXRMZXZlbChteUhlcm8pID09IDEzIHRoZW4NCiAgICAgICAgTGV2ZWxTcGVsbChfRSkNCmVsc2VpZiBHZXRMZXZlbChteUhlcm8pID09IDE0IHRoZW4NCiAgICAgICAgTGV2ZWxTcGVsbChfVykNCmVsc2VpZiBHZXRMZXZlbChteUhlcm8pID09IDE1IHRoZW4NCiAgICAgICAgTGV2ZWxTcGVsbChfRSkNCmVsc2VpZiBHZXRMZXZlbChteUhlcm8pID09IDE2IHRoZW4NCiAgICAgICAgTGV2ZWxTcGVsbChfUikNCmVsc2VpZiBHZXRMZXZlbChteUhlcm8pID09IDE3IHRoZW4NCiAgICAgICAgTGV2ZWxTcGVsbChfRSkNCmVsc2VpZiBHZXRMZXZlbChteUhlcm8pID09IDE4IHRoZW4NCiAgICAgICAgTGV2ZWxTcGVsbChfRSkNCmVuZA0KZW5kDQoNCmZ1bmN0aW9uIERyYXdpbmdzKCkNCmlmIERyYXdRLmdldFZhbHVlKCkgdGhlbg0KCURyYXdDaXJjbGUoR2V0T3JpZ2luKG15SGVybyksODk1LDMsRHJhd0hELmdldFZhbHVlKCksMHhmZjdCNjhFRSkNCgllbmQNCmlmIERyYXdXRS5nZXRWYWx1ZSgpIHRoZW4NCglEcmF3Q2lyY2xlKEdldE9yaWdpbihteUhlcm8pLDYwMCwzLERyYXdIRC5nZXRWYWx1ZSgpLDB4ZmY3QjY4RUUpDQoJZW5kDQplbmQ="), nil, "bt", _ENV))()
