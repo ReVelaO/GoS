@@ -8,7 +8,6 @@ local Combo = root.addItem(SubMenu.new("Combo"))
 	local EU = Combo.addItem(MenuBool.new("Use E",true))
 	local RU = Combo.addItem(MenuBool.new("Use R",true))
 	local RRU = Combo.addItem(MenuBool.new("Use R if rooted",true))
-	local AA = Combo.addItem(MenuBool.new("Block Auto-Attacks in Combo",true))
 	local Comb = Combo.addItem(MenuKeyBind.new("Combo", 32))
 	
 local Farm = root.addItem(SubMenu.new("Farm"))
@@ -41,8 +40,12 @@ local Drawings = root.addItem(SubMenu.new("Drawings"))
 local Pasiva = "ryzepassivecharged"
 
 OnLoop(function(myHero)
-if Comb.getValue() then 
-	DoCombo()
+if (GotBuff(myHero, "ryzepassivestacks") >= 2 ) and Comb.getValue() then 
+	DoCombo1()
+	end
+	
+if (GotBuff(myHero, "ryzepassivestacks") <= 1 ) and Comb.getValue() then 
+	DoCombo2()
 	end
 
 if LClear.getValue() then
@@ -63,10 +66,9 @@ if Enable.getValue() then
 end)
 
 
-function DoCombo()
+function DoCombo1()
 if Comb.getValue() then 
 	local target = IOW:GetTarget()
-	if AA.getValue() then IOW:DisableAutoAttacks() end
 			
 	if GoS:ValidTarget(target, 900) then					
 		if CanUseSpell(myHero, _W) == READY and WU.getValue() then
@@ -88,6 +90,36 @@ if Comb.getValue() then
 		if CanUseSpell(myHero, _R) == READY and RU.getValue() and (GotBuff(myHero, "ryzepassivecharged") > 0) then
 			CastSpell(_R)
 		elseif CanUseSpell(myHero, _R) == READY and RRU.getValue() and (GotBuff(myHero, "ryzepassivecharged") > 0) and (GotBuff(target , "RyzeW") == 1) then
+			CastSpell(_R)
+			end
+		end
+	end
+end
+
+function DoCombo2()
+if Comb.getValue() then 
+	local target = IOW:GetTarget()
+			
+	if GoS:ValidTarget(target, 900) then							                     			
+		local QPred = GetPredictionForPlayer(GoS:myHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)
+		local ChampEnemy = GetOrigin(target)		
+		if CanUseSpell(myHero, _Q) == READY and (GotBuff(target, "RyzeW") == 1) and QU.getValue() then
+			CastSkillShot(_Q,ChampEnemy.x,ChampEnemy.y,ChampEnemy.z)						
+		elseif CanUseSpell(myHero, _Q) == READY and QPred.HitChance == 1 and not (GotBuff(target, "RyzeW") == 1) and QU.getValue() then
+			CastSkillShot(_Q,QPred.PredPos.x,QPred.PredPos.y,QPred.PredPos.z)						
+			end
+
+		if CanUseSpell(myHero, _W) == READY and WU.getValue() then
+			CastTargetSpell(target, _W)
+			end
+		
+		if CanUseSpell(myHero, _E) == READY and EU.getValue() then
+			CastTargetSpell(target, _E)
+			end
+
+		if CanUseSpell(myHero, _R) == READY and RU.getValue() then
+			CastSpell(_R)
+		elseif CanUseSpell(myHero, _R) == READY and RRU.getValue() and (GotBuff(target , "RyzeW") == 1) then
 			CastSpell(_R)
 			end
 		end
