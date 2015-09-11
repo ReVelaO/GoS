@@ -1,5 +1,3 @@
-require('IOW')
-
 supportedHero = {["Ryze"] = true}
 class "Ryze"
 
