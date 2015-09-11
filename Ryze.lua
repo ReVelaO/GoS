@@ -35,23 +35,19 @@ local Drawings = root.addItem(SubMenu.new("Drawings"))
 	local Info = Drawings.addItem(MenuSeparator.new("If Drawings has not purple color then"))
 	local Info1 = Drawings.addItem(MenuSeparator.new("Press F6 x2"))
 	
---Updated 5.17.               
-local Pasiva = "ryzepassivecharged"
+--Updated 5.17.
 
 OnLoop(function(myHero)
-if (GotBuff(myHero, "ryzepassivestacks") >= 2 ) and Comb.getValue() then 
+if Comb.getValue() then 
 	DoCombo1()
-	end
-	
-if (GotBuff(myHero, "ryzepassivestacks") <= 1 ) and Comb.getValue() then 
 	DoCombo2()
 	end
 
-if LClear.getValue() then
+if 	LClear.getValue() then
 	LaneClear()
 	end	
 	
-if JClear.getValue() then
+if 	JClear.getValue() then
 	JungleClear()
 	end		
 
@@ -59,14 +55,14 @@ if	ALS.getValue() then
 	AutoLevelS()
 	end
 
-if Enable.getValue() then
+if 	Enable.getValue() then
 	Drawings()
 	end
 end)
 
 
 function DoCombo1()
-if Comb.getValue() then 
+if Comb.getValue() and GotBuff(myHero, "ryzepassivestacks") >= 2 then 
 	local target = IOW:GetTarget()
 			
 	if GoS:ValidTarget(target, 900) then					
@@ -96,7 +92,7 @@ if Comb.getValue() then
 end
 
 function DoCombo2()
-if Comb.getValue() then 
+if Comb.getValue() and GotBuff(myHero, "ryzepassivestacks") <= 1 then 
 	local target = IOW:GetTarget()
 			
 	if GoS:ValidTarget(target, 900) then							                     			
