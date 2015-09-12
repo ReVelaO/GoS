@@ -100,7 +100,7 @@ function Ryze:WQER()
                 self:UseQRooted(target)
             elseif not QREADY and WREADY then
                 self:UseW(target)
-            elseif not QREADY and QREADY then
+            elseif not WREADY and QREADY then
                 self:UseQRooted(target)
             elseif not QREADY and EREADY then
                 self:UseE(target)
