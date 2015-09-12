@@ -7,11 +7,7 @@ OnLoop(function(myHero) self:Loop(myHero) end)
 
 MainMenu = Menu("DarkRyze", "Ryze")
 MainMenu:SubMenu("Combo", "Combo")
-MainMenu.Combo:Boolean("Q", "Use Q", true)
-MainMenu.Combo:Boolean("W", "Use W", true)
-MainMenu.Combo:Boolean("E", "Use E", true)
-MainMenu.Combo:Boolean("R", "Use R", true)
-MainMenu.Combo:Boolean("RR", "Use R if rooted", true)
+MainMenu.Combo:List("combos", "Combo Options", 1, {"WQER", "QWER"})
 	
 end
 --Updated 5.17.
@@ -19,8 +15,11 @@ end
 
 function Ryze:Loop(myHero)
 	self:Req()
-if _G.IOW:Mode() == "Combo" then	
-	self:DoCombo()
+if _G.IOW:Mode() == "Combo" and MainMenu.Combo.combos:Value() == 1 then	
+	self:WQER()
+	end
+if _G.IOW:Mode() == "Combo" and MainMenu.Combo.combos:Value() == 2 then	
+	self:QWER()
 	end
 end
 
@@ -37,26 +36,26 @@ end
 
 function Ryze:UseQPred(target)
 	local QPred = GetPredictionForPlayer(GoS:myHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)		
-	if QREADY and QPred.HitChance == 1 and not rooted and MainMenu.Combo.Q:Value() then
+	if QREADY and QPred.HitChance == 1 then
 	CastSkillShot(_Q,QPred.PredPos.x,QPred.PredPos.y,QPred.PredPos.z)
 	end
 end
 
 function Ryze:UseQRooted(target)
 	local ChampEnemy = GetOrigin(target)		
-	if QREADY and rooted and MainMenu.Combo.Q:Value() then
+	if QREADY and rooted then
 	CastSkillShot(_Q,ChampEnemy.x,ChampEnemy.y,ChampEnemy.z)
 	end
 end
 
 function Ryze:UseW(target)
-	if WREADY and MainMenu.Combo.E:Value() then
+	if WREADY then
 	CastTargetSpell(target, _W)
 	end
 end
 
 function Ryze:UseE(target)
-	if EREADY and MainMenu.Combo.W:Value() then
+	if EREADY then
 	CastTargetSpell(target, _E)
 	end
 end
@@ -65,13 +64,12 @@ function Ryze:UseR()
 	CastSpell(_R)
 end
 
-function Ryze:DoCombo()
-if stacks >= 2 then 			
+function Ryze:WQER()			
 	if GoS:ValidTarget(target, 900) then		
-		if WREADY then
+			if WREADY then
                 self:UseW(target)
             elseif not WREADY and QREADY then
-                self:UseQPred(target)
+                self:UseQRooted(target)
             elseif not QREADY and EREADY then
                 self:UseE(target)
             elseif not EREADY and RREADY then
@@ -79,59 +77,79 @@ if stacks >= 2 then
             elseif not RREADY and WREADY then
                 self:UseW(target)
             elseif not WREADY and QREADY then
-                self:UseQPred(target)
+                self:UseQRooted(target)
             elseif not QREADY and EREADY then
                 self:UseE(target)
             elseif not EREADY and QREADY then
-                self:UseQPred(target)
+                self:UseQRooted(target)
             elseif not QREADY and WREADY then
                 self:UseW(target)
             elseif not WREADY and QREADY then
-                self:UseQPred(target)
+                self:UseQRooted(target)
             elseif not QREADY and EREADY then
                 self:UseE(target)
             elseif not EREADY and QREADY then
-                self:UseQPred(target)
+                self:UseQRooted(target)
             elseif not QREADY and WREADY then
                 self:UseW(target)
             elseif not WREADY and QREADY then
-                self:UseQPred(target)
+                self:UseQRooted(target)
             elseif not QREADY and EREADY then
                 self:UseE(target)
             elseif not EREADY and QREADY then
-                self:UseQPred(target)
+                self:UseQRooted(target)
             elseif not QREADY and WREADY then
                 self:UseW(target)
             elseif not QREADY and QREADY then
-                self:UseQPred(target)
+                self:UseQRooted(target)
             elseif not QREADY and EREADY then
                 self:UseE(target)
             elseif not EREADY and RREADY then
                 self:UseR()
             elseif not RREADY and WREADY then
                 self:UseW(target)
-            end
-		end
+        end
 	end
+end
 
-if stacks <= 1 then 			
-	if GoS:ValidTarget(target, 900) then			
-		if QREADY then
-			self:UseQPred(target)								
-		elseif QREADY and rooted then
-			self:UseQRooted(target)						
-			end
-		if WREADY then
-			self:UseW(target)
-			end		
-		if EREADY then
-			self:UseE(target)
-			end
-		if RREADY then
-			self:UseR()
-			end
+function Ryze:QWER()			
+	if GoS:ValidTarget(target, 900) then		
+			if QREADY then
+                self:UseQPred(target)
+            elseif not QREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and RREADY then
+                self:UseR()
+            elseif not RREADY and QREADY then
+                self:UseQPred(target)        
+            elseif not QREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and RREADY then
+                self:UseR()
+            elseif not RREADY and QREADY then
+                self:UseQPred(target)
+            elseif not QREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and RREADY then
+                self:UseR()
+            elseif not RREADY and QREADY then
+                self:UseQPred(target)
+            elseif not QREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and RREADY then
+                self:UseR()
+            elseif not RREADY and QREADY then
+                self:UseQPred(target)
+				end
 		end
-	end
 end
 
 if supportedHero[GetObjectName(myHero)] == true then
