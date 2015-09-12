@@ -38,7 +38,7 @@ end
 --Updated 5.17.
 
 function Ryze:Loop(myHero)
-self:Checks()
+self:Req()
 
 if _G.IOW:Mode() == "Combo" then 
 	self:DoCombo()
@@ -66,7 +66,7 @@ if MainMenu.Drawings.DWE:Value() then
 	end
 end
 
-function Ryze:Checks()
+function Ryze:Req()
 	rooted = (GotBuff(target, "RyzeW") == 1)
 	gotpasive = (GotBuff(myHero, "ryzepassivecharged") > 0)
 	QREADY = CanUseSpell(myHero, _Q) == READY
