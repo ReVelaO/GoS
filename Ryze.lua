@@ -40,20 +40,20 @@ end
 function Ryze:Loop(myHero)
 self:Req()
 
+if 	MainMenu.Drawings.ED:Value() then
+	self:Drawings()
+	end
+
+if	MainMenu.Misc.AutoLevelS:Value() then
+	self:AutoLevelS()
+	end
+	
 if _G.IOW:Mode() == "Combo" then 
 	self:DoCombo()
 	end
 
 if 	IOW:Mode() == "LaneClear" then
 	self:LaneAndJungle()
-	end	
-
-if	MainMenu.Misc.AutoLevelS:Value() then
-	self:AutoLevelS()
-	end
-
-if 	MainMenu.Drawings.ED:Value() then
-	self:Drawings()
 	end
 end
 
@@ -154,7 +154,7 @@ if IOW:Mode() == "LaneClear" then
 					end
 		end
     end    
-    
+if IOW:Mode() == "LaneClear" then     
                 for i,minion in pairs(GoS:GetAllMinions(MINION_JUNGLE)) do    
                         if GoS:IsInDistance(minion, 600) then
                         local PMinion = GetOrigin(minion)
@@ -176,6 +176,7 @@ if IOW:Mode() == "LaneClear" then
           		end
        		end
 		end
+end
 
 function Ryze:AutoLevelS()
 if MainMenu.Misc.AutoLevelS:Value() then
