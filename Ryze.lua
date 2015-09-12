@@ -1,5 +1,3 @@
-require ('IOW')
-
 supportedHero = {["Ryze"] = true}
 class "Ryze"
 
@@ -43,20 +41,12 @@ function Ryze:Loop(myHero)
 self:Checks()
 
 if _G.IOW:Mode() == "Combo" then 
-	self:DoCombo1()
-	end
-	
-if _G.IOW:Mode() == "Combo" then 
-	self:DoCombo2()
+	self:DoCombo()
 	end
 
 if 	IOW:Mode() == "LaneClear" then
-	self:LaneClear()
+	self:Clear()
 	end	
-	
-if 	IOW:Mode() == "LaneClear" then
-	self:JungleClear()
-	end		
 
 if	MainMenu.Misc.AutoLevelS:Value() then
 	self:AutoLevelS()
@@ -85,7 +75,7 @@ function Ryze:Checks()
 	RREADY = CanUseSpell(myHero, _R) == READY
 end
 
-function Ryze:DoCombo1()
+function Ryze:DoCombo()
 if IOW:Mode() == "Combo" and GotBuff(myHero, "ryzepassivestacks") >= 2 then 
 	local target = IOW:GetTarget()
 			
@@ -113,9 +103,7 @@ if IOW:Mode() == "Combo" and GotBuff(myHero, "ryzepassivestacks") >= 2 then
 			end
 		end
 	end
-end
 
-function Ryze:DoCombo2()
 if IOW:Mode() == "Combo" and GotBuff(myHero, "ryzepassivestacks") <= 1 then 
 	local target = IOW:GetTarget()
 			
@@ -143,7 +131,7 @@ if IOW:Mode() == "Combo" and GotBuff(myHero, "ryzepassivestacks") <= 1 then
 	end
 end
 
-function Ryze:LaneClear()
+function Ryze:Clear()
 if IOW:Mode() == "LaneClear" then      
                 for i,minion in pairs(GoS:GetAllMinions(MINION_ENEMY)) do    
                         if GoS:IsInDistance(minion, 600) then
@@ -166,10 +154,7 @@ if IOW:Mode() == "LaneClear" then
 					end
 		end
     end    
-end
-
-function Ryze:JungleClear()
-if IOW:Mode() == "LaneClear" then      
+    
                 for i,minion in pairs(GoS:GetAllMinions(MINION_JUNGLE)) do    
                         if GoS:IsInDistance(minion, 600) then
                         local PMinion = GetOrigin(minion)
@@ -190,8 +175,7 @@ if IOW:Mode() == "LaneClear" then
 						end
           		end
        		end
-		end    
-end
+		end
 
 function Ryze:AutoLevelS()
 if MainMenu.Misc.AutoLevelS:Value() then
