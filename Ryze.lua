@@ -37,24 +37,39 @@ MainMenu.Drawings:Slider("DrawHD", "Quality Circles", 255, 1, 255, 1)
 end
 --Updated 5.17.
 
+local Tick = 0 -- Do u Know ^-^
+
 function Ryze:Loop(myHero)
-self:Req()
+Tick = Tick + 1	
+	self:Req()
 
 if 	MainMenu.Drawings.ED:Value() then
 	self:Drawings()
 	end
 
-if	MainMenu.Misc.AutoLevelS:Value() then
+if Tick > 5 then
+	if	MainMenu.Misc.AutoLevelS:Value() then
 	self:AutoLevelS()
 	end
 	
-if 	_G.IOW:Mode() == "Combo" then 
+if _G.IOW:Mode() == "Combo" then 
 	self:DoCombo()
 	end
 
 if 	IOW:Mode() == "LaneClear" then
 	self:LaneAndJungle()
-	end
+	end	
+	Tick = 0
+	end	
+end
+
+function Ryze:Req()
+	rooted = (GotBuff(target, "RyzeW") == 1)
+	gotpasive = (GotBuff(myHero, "ryzepassivecharged") > 0)
+	QREADY = CanUseSpell(myHero, _Q) == READY
+	WREADY = CanUseSpell(myHero, _W) == READY
+	EREADY = CanUseSpell(myHero, _E) == READY
+	RREADY = CanUseSpell(myHero, _R) == READY
 end
 
 function Ryze:Drawings()
@@ -66,14 +81,49 @@ if MainMenu.Drawings.DWE:Value() then
 	end
 end
 
-function Ryze:Req()
-	rooted = (GotBuff(target, "RyzeW") == 1)
-	gotpasive = (GotBuff(myHero, "ryzepassivecharged") > 0)
-	QREADY = CanUseSpell(myHero, _Q) == READY
-	WREADY = CanUseSpell(myHero, _W) == READY
-	EREADY = CanUseSpell(myHero, _E) == READY
-	RREADY = CanUseSpell(myHero, _R) == READY
+
+function Ryze:AutoLevelS()
+if MainMenu.Misc.AutoLevelS:Value() then
+if GetLevel(myHero) == 1 then
+	LevelSpell(_Q)
+elseif GetLevel(myHero) == 2 then
+	LevelSpell(_W)
+elseif GetLevel(myHero) == 3 then
+	LevelSpell(_E)
+elseif GetLevel(myHero) == 4 then
+        LevelSpell(_Q)
+elseif GetLevel(myHero) == 5 then
+        LevelSpell(_W)
+elseif GetLevel(myHero) == 6 then
+	LevelSpell(_R)
+elseif GetLevel(myHero) == 7 then
+	LevelSpell(_Q)
+elseif GetLevel(myHero) == 8 then
+        LevelSpell(_Q)
+elseif GetLevel(myHero) == 9 then
+        LevelSpell(_Q)
+elseif GetLevel(myHero) == 10 then
+        LevelSpell(_W)
+elseif GetLevel(myHero) == 11 then
+        LevelSpell(_R)
+elseif GetLevel(myHero) == 12 then
+        LevelSpell(_W)
+elseif GetLevel(myHero) == 13 then
+        LevelSpell(_E)
+elseif GetLevel(myHero) == 14 then
+        LevelSpell(_W)
+elseif GetLevel(myHero) == 15 then
+        LevelSpell(_E)
+elseif GetLevel(myHero) == 16 then
+        LevelSpell(_R)
+elseif GetLevel(myHero) == 17 then
+        LevelSpell(_E)
+elseif GetLevel(myHero) == 18 then
+        LevelSpell(_E)
 end
+end
+end
+
 
 function Ryze:DoCombo()
 if IOW:Mode() == "Combo" and GotBuff(myHero, "ryzepassivestacks") >= 2 then 
@@ -175,50 +225,10 @@ if IOW:Mode() == "LaneClear" then
 						end
           		end
        		end
-	end
+		end
 end
 
-function Ryze:AutoLevelS()
-if MainMenu.Misc.AutoLevelS:Value() then
-if GetLevel(myHero) == 1 then
-	LevelSpell(_Q)
-elseif GetLevel(myHero) == 2 then
-	LevelSpell(_W)
-elseif GetLevel(myHero) == 3 then
-	LevelSpell(_E)
-elseif GetLevel(myHero) == 4 then
-        LevelSpell(_Q)
-elseif GetLevel(myHero) == 5 then
-        LevelSpell(_W)
-elseif GetLevel(myHero) == 6 then
-	LevelSpell(_R)
-elseif GetLevel(myHero) == 7 then
-	LevelSpell(_Q)
-elseif GetLevel(myHero) == 8 then
-        LevelSpell(_Q)
-elseif GetLevel(myHero) == 9 then
-        LevelSpell(_Q)
-elseif GetLevel(myHero) == 10 then
-        LevelSpell(_W)
-elseif GetLevel(myHero) == 11 then
-        LevelSpell(_R)
-elseif GetLevel(myHero) == 12 then
-        LevelSpell(_W)
-elseif GetLevel(myHero) == 13 then
-        LevelSpell(_E)
-elseif GetLevel(myHero) == 14 then
-        LevelSpell(_W)
-elseif GetLevel(myHero) == 15 then
-        LevelSpell(_E)
-elseif GetLevel(myHero) == 16 then
-        LevelSpell(_R)
-elseif GetLevel(myHero) == 17 then
-        LevelSpell(_E)
-elseif GetLevel(myHero) == 18 then
-        LevelSpell(_E)
-end
-end
-end
+
 
 if supportedHero[GetObjectName(myHero)] == true then
 if _G[GetObjectName(myHero)] then
