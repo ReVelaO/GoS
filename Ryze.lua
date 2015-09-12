@@ -37,7 +37,7 @@ MainMenu.Drawings:Slider("DrawHD", "Quality Circles", 255, 1, 255, 1)
 end
 --Updated 5.17.
 
-local Tick = 0 -- Do u Know ^-^
+local Tick = 0 -- do not angry ^-^
 
 function Ryze:Loop(myHero)
 Tick = Tick + 1	
@@ -59,8 +59,8 @@ if _G.IOW:Mode() == "Combo" then
 if 	IOW:Mode() == "LaneClear" then
 	self:LaneAndJungle()
 	end	
-	Tick = 0
-	end	
+Tick = 0
+end	
 end
 
 function Ryze:Req()
