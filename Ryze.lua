@@ -7,7 +7,7 @@ function Ryze:__init()
 
 OnLoop(function(myHero) self:Loop(myHero) end)
 
-MainMenu = Menu("Ryze", "Ryze")
+MainMenu = Menu("DarkRyze", "Ryze")
 MainMenu:SubMenu("Combo", "Combo")
 MainMenu.Combo:Boolean("Q", "Use Q", true)
 MainMenu.Combo:Boolean("W", "Use W", true)
