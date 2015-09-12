@@ -48,7 +48,7 @@ if	MainMenu.Misc.AutoLevelS:Value() then
 	self:AutoLevelS()
 	end
 	
-if _G.IOW:Mode() == "Combo" then 
+if 	_G.IOW:Mode() == "Combo" then 
 	self:DoCombo()
 	end
 
@@ -175,7 +175,7 @@ if IOW:Mode() == "LaneClear" then
 						end
           		end
        		end
-		end
+	end
 end
 
 function Ryze:AutoLevelS()
