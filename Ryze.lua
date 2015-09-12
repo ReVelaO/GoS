@@ -45,7 +45,7 @@ if _G.IOW:Mode() == "Combo" then
 	end
 
 if 	IOW:Mode() == "LaneClear" then
-	self:Clear()
+	self:LaneAndJungle()
 	end	
 
 if	MainMenu.Misc.AutoLevelS:Value() then
@@ -131,7 +131,7 @@ if IOW:Mode() == "Combo" and GotBuff(myHero, "ryzepassivestacks") <= 1 then
 	end
 end
 
-function Ryze:Clear()
+function Ryze:LaneAndJungle()
 if IOW:Mode() == "LaneClear" then      
                 for i,minion in pairs(GoS:GetAllMinions(MINION_ENEMY)) do    
                         if GoS:IsInDistance(minion, 600) then
