@@ -89,10 +89,10 @@ if stacks >= 2 then
 
 if stacks <= 1 then 			
 	if GoS:ValidTarget(target, 900) then			
-		if QREADY and rooted then
-			self:UseQRooted(target)								
-		elseif QREADY and not rooted then
-			self:UseQPred(target)						
+		if QREADY then
+			self:UseQPred(target)								
+		elseif QREADY and rooted then
+			self:UseQRooted(target)						
 			end
 		if WREADY then
 			self:UseW(target)
