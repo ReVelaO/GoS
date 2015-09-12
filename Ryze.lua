@@ -37,30 +37,24 @@ MainMenu.Drawings:Slider("DrawHD", "Quality Circles", 255, 1, 255, 1)
 end
 --Updated 5.17.
 
-local Tick = 0 -- do not angry ^-^
-
 function Ryze:Loop(myHero)
-Tick = Tick + 1	
 	self:Req()
 
-if 	MainMenu.Drawings.ED:Value() then
+if MainMenu.Drawings.ED:Value() then
 	self:Drawings()
-	end
+end
 
-if Tick > 5 then
-	if	MainMenu.Misc.AutoLevelS:Value() then
+if MainMenu.Misc.AutoLevelS:Value() then
 	self:AutoLevelS()
-	end
+end
 	
 if _G.IOW:Mode() == "Combo" then 
 	self:DoCombo()
-	end
+end
 
-if 	IOW:Mode() == "LaneClear" then
+if IOW:Mode() == "LaneClear" then
 	self:LaneAndJungle()
-	end	
-Tick = 0
-end	
+end
 end
 
 function Ryze:Req()
