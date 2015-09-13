@@ -8,10 +8,7 @@ OnLoop(function(myHero) self:Loop(myHero) end)
 MainMenu = Menu("DarkRyze", "Ryze")
 MainMenu:SubMenu("Combo", "Combo")
 MainMenu.Combo:Boolean("Q", "Use Q", true)
-MainMenu.Combo:Boolean("W", "Use W", true)
-MainMenu.Combo:Boolean("E", "Use E", true)
-MainMenu.Combo:Boolean("R", "Use R", true)
-MainMenu.Combo:Boolean("RR", "Use R if rooted", true)
+MainMenu.Combo:List("combos", "Combo Options", 1, {"WQER", "QWER"})
 	
 MainMenu:SubMenu("LaneClear", "Lane Clear")
 MainMenu.LaneClear:Boolean("Q", "Use Q", true)
@@ -48,9 +45,13 @@ if MainMenu.Misc.AutoLevelS:Value() then
 	self:AutoLevelS()
 end
 	
-if _G.IOW:Mode() == "Combo" then 
-	self:DoCombo()
+if _G.IOW:Mode() == "Combo" and MainMenu.Combo.combos:Value() == 1 then	
+	self:WQER()
 end
+
+if _G.IOW:Mode() == "Combo" and MainMenu.Combo.combos:Value() == 2 then	
+	self:QWER()
+	end
 
 if IOW:Mode() == "LaneClear" then
 	self:LaneAndJungle()
@@ -60,6 +61,8 @@ end
 function Ryze:Req()
 	rooted = (GotBuff(target, "RyzeW") == 1)
 	gotpasive = (GotBuff(myHero, "ryzepassivecharged") > 0)
+	stacks = GotBuff(myHero, "ryzepassivestacks")
+	target = IOW:GetTarget()
 	QREADY = CanUseSpell(myHero, _Q) == READY
 	WREADY = CanUseSpell(myHero, _W) == READY
 	EREADY = CanUseSpell(myHero, _E) == READY
@@ -75,6 +78,35 @@ if MainMenu.Drawings.DWE:Value() then
 	end
 end
 
+function Ryze:UseQPred(target)
+	local QPred = GetPredictionForPlayer(GoS:myHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)		
+	if QREADY and QPred.HitChance == 1 then
+	CastSkillShot(_Q,QPred.PredPos.x,QPred.PredPos.y,QPred.PredPos.z)
+	end
+end
+
+function Ryze:UseQRooted(target)
+	local ChampEnemy = GetOrigin(target)		
+	if QREADY and rooted then
+	CastSkillShot(_Q,ChampEnemy.x,ChampEnemy.y,ChampEnemy.z)
+	end
+end
+
+function Ryze:UseW(target)
+	if WREADY then
+	CastTargetSpell(target, _W)
+	end
+end
+
+function Ryze:UseE(target)
+	if EREADY then
+	CastTargetSpell(target, _E)
+	end
+end
+
+function Ryze:UseR()
+	CastSpell(_R)
+end
 
 function Ryze:AutoLevelS()
 if MainMenu.Misc.AutoLevelS:Value() then
@@ -119,60 +151,92 @@ end
 end
 
 
-function Ryze:DoCombo()
-if IOW:Mode() == "Combo" and GotBuff(myHero, "ryzepassivestacks") >= 2 then 
-	local target = IOW:GetTarget()
-			
-	if GoS:ValidTarget(target, 900) then					
-		if WREADY and MainMenu.Combo.W:Value() then
-			CastTargetSpell(target, _W)
-			end                     	
-		
-		local QPred = GetPredictionForPlayer(GoS:myHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)
-		local ChampEnemy = GetOrigin(target)		
-		if QREADY and rooted and MainMenu.Combo.Q:Value() then
-			CastSkillShot(_Q,ChampEnemy.x,ChampEnemy.y,ChampEnemy.z)						
-		elseif QREADY and QPred.HitChance == 1 and not rooted and MainMenu.Combo.Q:Value() then
-			CastSkillShot(_Q,QPred.PredPos.x,QPred.PredPos.y,QPred.PredPos.z)						
-			end
-
-		if EREADY and MainMenu.Combo.E:Value() then
-			CastTargetSpell(target, _E)
-			end
-
-		if RREADY and MainMenu.Combo.R:Value() and gotpasive then
-			CastSpell(_R)
-		elseif RREADY and MainMenu.Combo.RR:Value() and gotpasive and rooted then
-			CastSpell(_R)
-			end
-		end
+function Ryze:WQER()			
+	if GoS:ValidTarget(target, 900) then		
+			if WREADY then
+                self:UseW(target)
+            elseif not WREADY and QREADY then
+                self:UseQRooted(target)
+            elseif not QREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and RREADY then
+                self:UseR()
+            elseif not RREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and QREADY then
+                self:UseQRooted(target)
+            elseif not QREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and QREADY then
+                self:UseQRooted(target)
+            elseif not QREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and QREADY then
+                self:UseQRooted(target)
+            elseif not QREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and QREADY then
+                self:UseQRooted(target)
+            elseif not QREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and QREADY then
+                self:UseQRooted(target)
+            elseif not QREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and QREADY then
+                self:UseQRooted(target)
+            elseif not QREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and QREADY then
+                self:UseQRooted(target)
+            elseif not QREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and RREADY then
+                self:UseR()
+            elseif not RREADY and WREADY then
+                self:UseW(target)
+        end
 	end
+end
 
-if IOW:Mode() == "Combo" and GotBuff(myHero, "ryzepassivestacks") <= 1 then 
-	local target = IOW:GetTarget()
-			
-	if GoS:ValidTarget(target, 900) then							                     			
-		local QPred = GetPredictionForPlayer(GoS:myHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)
-		local ChampEnemy = GetOrigin(target)		
-		if QREADY and rooted and MainMenu.Combo.Q:Value() then
-			CastSkillShot(_Q,ChampEnemy.x,ChampEnemy.y,ChampEnemy.z)						
-		elseif QREADY and QPred.HitChance == 1 and not rooted and MainMenu.Combo.Q:Value() then
-			CastSkillShot(_Q,QPred.PredPos.x,QPred.PredPos.y,QPred.PredPos.z)						
-			end
-
-		if WREADY and MainMenu.Combo.W:Value() then
-			CastTargetSpell(target, _W)
-			end
-		
-		if EREADY and MainMenu.Combo.E:Value() then
-			CastTargetSpell(target, _E)
-			end
-
-		if RREADY and MainMenu.Combo.R:Value() then
-			CastSpell(_R)
-			end
+function Ryze:QWER()			
+	if GoS:ValidTarget(target, 900) then		
+			if QREADY then
+                self:UseQPred(target)
+            elseif not QREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and RREADY then
+                self:UseR()
+            elseif not RREADY and QREADY then
+                self:UseQPred(target)        
+            elseif not QREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and RREADY then
+                self:UseR()
+            elseif not RREADY and QREADY then
+                self:UseQPred(target)
+            elseif not QREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and RREADY then
+                self:UseR()
+            elseif not RREADY and QREADY then
+                self:UseQPred(target)
+            elseif not QREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and RREADY then
+                self:UseR()
+            elseif not RREADY and QREADY then
+                self:UseQPred(target)
+				end
 		end
-	end
 end
 
 function Ryze:LaneAndJungle()
@@ -192,7 +256,7 @@ if IOW:Mode() == "LaneClear" then
 						CastTargetSpell(minion, _E)
 						end 		
              
-						if RREADY and MainMenu.LaneClear.R:Value() and gotpasive then
+						if RREADY and MainMenu.LaneClear.R:Value() then
 						CastSpell(_R)			 
 						end
 					end
@@ -214,7 +278,7 @@ if IOW:Mode() == "LaneClear" then
 						CastTargetSpell(minion, _E)
 						end 		
              
-						if RREADY and MainMenu.JungleClear.R:Value() and gotpasive then
+						if RREADY and MainMenu.JungleClear.R:Value() then
 						CastSpell(_R)			 
 						end
           		end
