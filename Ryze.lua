@@ -78,36 +78,6 @@ if MainMenu.Drawings.DWE:Value() then
 	end
 end
 
-function Ryze:UseQPred(target)
-	local QPred = GetPredictionForPlayer(GoS:myHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)		
-	if QREADY and QPred.HitChance == 1 then
-	CastSkillShot(_Q,QPred.PredPos.x,QPred.PredPos.y,QPred.PredPos.z)
-	end
-end
-
-function Ryze:UseQRooted(target)
-	local ChampEnemy = GetOrigin(target)		
-	if QREADY and rooted then
-	CastSkillShot(_Q,ChampEnemy.x,ChampEnemy.y,ChampEnemy.z)
-	end
-end
-
-function Ryze:UseW(target)
-	if WREADY then
-	CastTargetSpell(target, _W)
-	end
-end
-
-function Ryze:UseE(target)
-	if EREADY then
-	CastTargetSpell(target, _E)
-	end
-end
-
-function Ryze:UseR()
-	CastSpell(_R)
-end
-
 function Ryze:AutoLevelS()
 if MainMenu.Misc.AutoLevelS:Value() then
 if GetLevel(myHero) == 1 then
@@ -150,6 +120,35 @@ end
 end
 end
 
+function Ryze:UseQPred(target)
+	local QPred = GetPredictionForPlayer(GoS:myHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)		
+	if QREADY and QPred.HitChance == 1 then
+	CastSkillShot(_Q,QPred.PredPos.x,QPred.PredPos.y,QPred.PredPos.z)
+	end
+end
+
+function Ryze:UseQRooted(target)
+	local ChampEnemy = GetOrigin(target)		
+	if QREADY and rooted then
+	CastSkillShot(_Q,ChampEnemy.x,ChampEnemy.y,ChampEnemy.z)
+	end
+end
+
+function Ryze:UseW(target)
+	if WREADY then
+	CastTargetSpell(target, _W)
+	end
+end
+
+function Ryze:UseE(target)
+	if EREADY then
+	CastTargetSpell(target, _E)
+	end
+end
+
+function Ryze:UseR()
+	CastSpell(_R)
+end
 
 function Ryze:WQER()			
 	if GoS:ValidTarget(target, 900) then		
