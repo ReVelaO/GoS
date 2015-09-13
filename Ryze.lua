@@ -7,7 +7,6 @@ OnLoop(function(myHero) self:Loop(myHero) end)
 
 MainMenu = Menu("DarkRyze", "Ryze")
 MainMenu:SubMenu("Combo", "Combo")
-MainMenu.Combo:Boolean("Q", "Use Q", true)
 MainMenu.Combo:List("combos", "Combo Options", 1, {"WQER", "QWER"})
 	
 MainMenu:SubMenu("LaneClear", "Lane Clear")
