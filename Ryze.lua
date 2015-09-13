@@ -128,7 +128,7 @@ end
 
 function Ryze:UseQRooted(target)
 	local ChampEnemy = GetOrigin(target)		
-	if QREADY and rooted then
+	if QREADY then
 	CastSkillShot(_Q,ChampEnemy.x,ChampEnemy.y,ChampEnemy.z)
 	end
 end
