@@ -11,7 +11,7 @@ DarkLissMenu.Combo:Boolean("Q", "Use Q", true)
 DarkLissMenu.Combo:Boolean("W", "Use W", true)
 DarkLissMenu.Combo:Boolean("E", "Use E", true)
 DarkLissMenu.Combo:List("EM", "E Modes", 1, {"To Target Position", "To Max Range", "No Reactive"})
-DarkLissMenu.Combo:Boolean("R", "Use R", true)
+DarkLissMenu.Combo:Boolean("R", "Use R", false)
 
 DarkLissMenu:SubMenu("Drawings", "Drawings")
 DarkLissMenu.Drawings:Boolean("ED", "Enable Drawings", true)
@@ -84,7 +84,7 @@ function Lissandra:UseQ(target)
 end
 
 function Lissandra:UseW()
-	if WREADY and GoS:IsInDistance(target, 450) then
+	if WREADY and GoS:IsInDistance(target, 445) then
 	CastSpell(_W)
 	end
 end
