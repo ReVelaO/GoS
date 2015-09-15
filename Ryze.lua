@@ -23,6 +23,7 @@ MainMenu.JungleClear:Boolean("R", "Use R", false)
 
 MainMenu:SubMenu("Misc", "Misc")
 MainMenu.Misc:Boolean("AutoLevelS", "Auto-Level Spells", true)
+MainMenu.Misc:Boolean("AutoIgnite", "Auto-Ignite", true)
 	
 MainMenu:SubMenu("Drawings", "Drawings")
 MainMenu.Drawings:Boolean("ED", "Enable Drawings", true)
@@ -42,6 +43,10 @@ end
 
 if MainMenu.Misc.AutoLevelS:Value() then
 	self:AutoLevelS()
+end
+
+if MainMenu.Misc.AutoIgnite:Value() then
+	self:AutoIgnite()
 end
 	
 if _G.IOW:Mode() == "Combo" and MainMenu.Combo.combos:Value() == 1 then	
@@ -117,6 +122,17 @@ elseif GetLevel(myHero) == 18 then
         LevelSpell(_E)
 end
 end
+end
+
+function Ryze:AutoIgnite()
+local Ignite = (GetCastName(GetMyHero(),SUMMONER_1):lower():find("summonerdot") and SUMMONER_1 or (GetCastName(GetMyHero(),SUMMONER_2):lower():find("summonerdot") and SUMMONER_2 or nil))
+		if Ignite then
+        for _, k in pairs(GoS:GetEnemyHeroes()) do
+            if CanUseSpell(GetMyHero(), Ignite) == READY and (20*GetLevel(GetMyHero())+50) > GetCurrentHP(k)+GetHPRegen(k)*2.5 and GoS:GetDistanceSqr(GetOrigin(k)) < 600*600 then
+                CastTargetSpell(k, Ignite)
+            end
+        end
+    end
 end
 
 function Ryze:UseQPred(target)
