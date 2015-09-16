@@ -136,7 +136,7 @@ local Ignite = (GetCastName(GetMyHero(),SUMMONER_1):lower():find("summonerdot") 
 end
 
 function Ryze:UseQPred(target)
-	local QPred = GetPredictionForPlayer(GoS:myHeroPos(),target,GetMoveSpeed(target),900,250,GetCastRange(myHero,_Q),55,false,true)		
+	local QPred = GetPredictionForPlayer(GoS:myHeroPos(),target,GetMoveSpeed(target),1700,250,900,50,false,true)		
 	if QREADY and QPred.HitChance == 1 then
 	CastSkillShot(_Q,QPred.PredPos.x,QPred.PredPos.y,QPred.PredPos.z)
 	end
