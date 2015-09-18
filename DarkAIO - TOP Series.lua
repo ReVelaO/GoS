@@ -463,19 +463,43 @@ function Ryze:WQER()
                 self:UseQRooted(target)
             elseif not QREADY and EREADY then
                 self:UseE(target)
-            elseif not EREADY and gotpasive and RREADY then
+            elseif not EREADY and RREADY then
                 self:UseR()
             elseif not RREADY and WREADY then
-               	self:UseW(target)
+                self:UseW(target)
             elseif not WREADY and QREADY then
-            	self:UseQRooted(target)
+                self:UseQRooted(target)
             elseif not QREADY and EREADY then
-               	self:UseE(target)
+                self:UseE(target)
             elseif not EREADY and QREADY then
-               	self:UseQPred(target)
+                self:UseQRooted(target)
             elseif not QREADY and WREADY then
-               	self:UseE(target)
-            end
+                self:UseW(target)
+            elseif not WREADY and QREADY then
+                self:UseQRooted(target)
+            elseif not QREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and QREADY then
+                self:UseQRooted(target)
+            elseif not QREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and QREADY then
+                self:UseQRooted(target)
+            elseif not QREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and QREADY then
+                self:UseQRooted(target)
+            elseif not QREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and QREADY then
+                self:UseQRooted(target)
+            elseif not QREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and RREADY then
+                self:UseR()
+            elseif not RREADY and WREADY then
+                self:UseW(target)
+        end
 	end
 end
 
@@ -487,10 +511,36 @@ function Ryze:QWER()
                 self:UseW(target)
             elseif not WREADY and EREADY then
                 self:UseE(target)
-            elseif not EREADY and gotpasive and RREADY then
+            elseif not EREADY and RREADY then
                 self:UseR()
-          	end
-	end
+            elseif not RREADY and QREADY then
+                self:UseQPred(target)        
+            elseif not QREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and RREADY then
+                self:UseR()
+            elseif not RREADY and QREADY then
+                self:UseQPred(target)
+            elseif not QREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and RREADY then
+                self:UseR()
+            elseif not RREADY and QREADY then
+                self:UseQPred(target)
+            elseif not QREADY and WREADY then
+                self:UseW(target)
+            elseif not WREADY and EREADY then
+                self:UseE(target)
+            elseif not EREADY and RREADY then
+                self:UseR()
+            elseif not RREADY and QREADY then
+                self:UseQPred(target)
+				end
+		end
 end
 
 function Ryze:LaneAndJungle()
