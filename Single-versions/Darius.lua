@@ -139,3 +139,9 @@ if GoS:ValidTarget(target, 575) then
 		end	
 	end
 end
+
+if supportedHero[GetObjectName(myHero)] == true then
+	if _G[GetObjectName(myHero)] then
+  		_G[GetObjectName(myHero)]()
+	end 
+end
