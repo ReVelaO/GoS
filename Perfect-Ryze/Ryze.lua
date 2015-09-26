@@ -99,10 +99,7 @@ self:Valores()
 end
 
 function Ryze:Valores()
-	atrapao = GotBuff(aweonao, "RyzeW") == 1
-	activa = GotBuff(myHero, "ryzepassivecharged") == 1
 	aweonao = IOW:GetTarget()
-	vidaglobal = GetCurrentHP(aweonao)
 	QREADY = CanUseSpell(myHero, _Q) == READY
 	WREADY = CanUseSpell(myHero, _W) == READY
 	EREADY = CanUseSpell(myHero, _E) == READY
