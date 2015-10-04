@@ -9,9 +9,9 @@ function Ryze:__init()
 
 OnLoop(function(myHero) self:Loop(myHero) end)
 
-Kappa = Menu("DarkRyze : Reworked", "Ryze")
+Kappa = Menu("DarkRyze : Reborn", "Ryze")
 Kappa:SubMenu("Combo", "Combo")
-Kappa.Combo:List("list1", "Combo options", 1, {"[WQER]", "[QWER]", "[QEWR]", "[WQRE]"})
+Kappa.Combo:Key("Combo1", "Combo! (Space)", string.byte(" ")) -- :')
 
 Kappa:SubMenu("lc", "Laneclear")
 Kappa.lc:Boolean("lq", "Clear with Q", true)
@@ -81,20 +81,8 @@ self:Valores()
 	self:LimpiezaCtm()
 	end
 	
-	if _G.IOW:Mode() == "Combo" and Kappa.Combo.list1:Value() == 1 then 
-	self:WQER()
-	end
-	
-	if _G.IOW:Mode() == "Combo" and Kappa.Combo.list1:Value() == 2 then
-	self:QWER()
-	end
-	
-	if _G.IOW:Mode() == "Combo" and Kappa.Combo.list1:Value() == 3 then
-	self:QEWR()
-	end
-	
-	if _G.IOW:Mode() == "Combo" and Kappa.Combo.list1:Value() == 4 then
-	self:WQRE()
+	if _G.IOW:Mode() == "Combo" then 
+	self:Combo()
 	end
 end
 
@@ -104,6 +92,8 @@ function Ryze:Valores()
 	WREADY = CanUseSpell(myHero, _W) == READY
 	EREADY = CanUseSpell(myHero, _E) == READY
 	RREADY = CanUseSpell(myHero, _R) == READY
+	Stacks = GotBuff(myHero, "ryzepassivestack")
+	Pasiva = GotBuff(myHero, "ryzepassivecharged")
 	PerfectQ = 60 * GetCastLevel(myHero, _Q) + 0.55*GetBonusAP(myHero) + 0.015*GetMaxMana(myHero) + 0.005*GetCastLevel(myHero,_Q)*GetMaxMana(myHero)
 	PerfectW = 80 * GetCastLevel(myHero, _W) + 0.4*GetBonusAP(myHero) + 0.025*GetMaxMana(myHero)
 	PerfectE = 36 * GetCastLevel(myHero, _E) + 0.2*GetBonusAP(myHero) + 0.02*GetMaxMana(myHero)
@@ -180,7 +170,7 @@ function Ryze:AutoQ(aweonao1)
 	for _, aweonao1 in pairs(GoS:GetEnemyHeroes()) do
 		local aweonao2 = GetCurrentHP(aweonao1)
 		local ctm = GoS:CalcDamage(myHero, aweonao1, 0, PerfectQ)
-		local Predazo1 = GetPredictionForPlayer(GoS:myHeroPos(),aweonao1,GetMoveSpeed(aweonao1),1700,250,900,50,false,true)
+		local Predazo1 = GetPredictionForPlayer(GoS:myHeroPos(),aweonao1,GetMoveSpeed(aweonao1),1700,250,900,50,true,true)
 		if QREADY and ((aweonao2 - 3) < ctm) and GoS:ValidTarget(aweonao1, 900) then
 			CastSkillShot(_Q,Predazo1.PredPos.x,Predazo1.PredPos.y,Predazo1.PredPos.z)
 		end
@@ -234,195 +224,71 @@ function Ryze:UseE(aweonao)
 end
 
 function Ryze:UseR()
+	if RREADY and Pasiva == 1 or Stacks >= 4 then
 	CastSpell(_R)
-end
-
-function Ryze:WQER()			
-	if GoS:ValidTarget(aweonao, 600) then		
-			if WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and QREADY then
-                self:UseQRooted(aweonao)
-            elseif not QREADY and EREADY then
-                self:UseE(aweonao)
-            elseif not EREADY and RREADY then
-                self:UseR()
-			elseif not RREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and QREADY then
-                self:UseQRooted(aweonao)
-            elseif not QREADY and EREADY then
-                self:UseE(aweonao)
-            elseif not EREADY and RREADY then
-                self:UseR()
-			elseif not RREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and QREADY then
-                self:UseQRooted(aweonao)
-            elseif not QREADY and EREADY then
-                self:UseE(aweonao)
-            elseif not EREADY and RREADY then
-                self:UseR()
-			elseif not RREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and QREADY then
-                self:UseQRooted(aweonao)
-            elseif not QREADY and EREADY then
-                self:UseE(aweonao)
-            elseif not EREADY and RREADY then
-                self:UseR()
-			elseif not RREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and QREADY then
-                self:UseQRooted(aweonao)
-            elseif not QREADY and EREADY then
-                self:UseE(aweonao)
-            elseif not EREADY and RREADY then
-                self:UseR()
-				
-        end
 	end
 end
 
-function Ryze:QWER()			
-	if GoS:ValidTarget(aweonao, 900) then		
-			if QREADY then
-                self:UseQPred(aweonao)
-            elseif not QREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and EREADY then
-                self:UseE(aweonao)
-            elseif not EREADY and RREADY then
-                self:UseR()
-			elseif not RREADY and QREADY then
-                self:UseQPred(aweonao)
-            elseif not QREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and EREADY then
-                self:UseE(aweonao)
-            elseif not EREADY and RREADY then
-                self:UseR()
-			elseif not RREADY and QREADY then
-                self:UseQPred(aweonao)
-            elseif not QREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and EREADY then
-                self:UseE(aweonao)
-            elseif not EREADY and RREADY then
-                self:UseR()
-			elseif not RREADY and QREADY then
-                self:UseQPred(aweonao)
-            elseif not QREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and EREADY then
-                self:UseE(aweonao)
-            elseif not EREADY and RREADY then
-                self:UseR()
-			elseif not RREADY and QREADY then
-                self:UseQPred(aweonao)
-            elseif not QREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and EREADY then
-                self:UseE(aweonao)
-            elseif not EREADY and RREADY then
-                self:UseR()
-							
-            end
+function Ryze:Combo()
+	if GoS:ValidTarget(aweonao, 900) then
+		if Stacks <= 2 and Pasiva == 0 then
+				if QREADY then
+				self:UseQPred(aweonao)
+				end
+				if WREADY then
+				self:UseW(aweonao)
+				end
+				if EREADY then
+				self:UseE(aweonao)
+				end
+				if RREADY then
+				self:UseR()
+				end
+		end
+		if Stacks == 3 then
+				if QREADY then
+				self:UseQPred(aweonao)
+				end
+				if EREADY then
+				self:UseE(aweonao)
+				end
+				if WREADY then
+				self:UseW(aweonao)
+				end
+				if RREADY then
+				self:UseR()
+				end
+		end
+		if Stacks == 4 then
+				if WREADY then
+				self:UseW(aweonao)
+				end
+				if QREADY then
+				self:UseQRooted(aweonao)
+				end
+				if EREADY then
+				self:UseE(aweonao)
+				end
+				if RREADY then
+				self:UseR()
+				end
+		end
+		if Pasiva == 1 then
+				if WREADY then 
+				self:UseW(aweonao)
+				end
+				if QREADY then
+				self:UseQRooted(aweonao)
+				end
+				if EREADY then
+				self:UseE(aweonao)
+				end
+				if RREADY then
+				self:UseR()
+				end
+			end
 	end
 end
-
-function Ryze:QEWR()			
-	if GoS:ValidTarget(aweonao, 900) then		
-			if QREADY then
-                self:UseQPred(aweonao)
-            elseif not QREADY and EREADY then
-                self:UseE(aweonao)
-            elseif not EREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and RREADY then
-                self:UseR()
-			elseif not RREADY and QREADY then
-                self:UseQPred(aweonao)
-            elseif not QREADY and EREADY then
-                self:UseE(aweonao)
-            elseif not EREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and RREADY then
-                self:UseR()
-			elseif not RREADY and QREADY then
-                self:UseQPred(aweonao)
-            elseif not QREADY and EREADY then
-                self:UseE(aweonao)
-            elseif not EREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and RREADY then
-                self:UseR()
-			elseif not RREADY and QREADY then
-                self:UseQPred(aweonao)
-            elseif not QREADY and EREADY then
-                self:UseE(aweonao)
-            elseif not EREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and RREADY then
-                self:UseR()
-			elseif not RREADY and QREADY then
-                self:UseQPred(aweonao)
-            elseif not QREADY and EREADY then
-                self:UseE(aweonao)
-            elseif not EREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and RREADY then
-                self:UseR()
-            end
-	end
-end
-
-function Ryze:WQRE()			
-	if GoS:ValidTarget(aweonao, 600) then		
-			if WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and QREADY then
-                self:UseQRooted(aweonao)
-            elseif not QREADY and RREADY then
-                self:UseR()
-            elseif not RREADY and EREADY then
-                self:UseE(aweonao)
-			elseif not EREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and QREADY then
-                self:UseQRooted(aweonao)
-            elseif not QREADY and RREADY then
-                self:UseR()
-            elseif not RREADY and EREADY then
-                self:UseE(aweonao)
-			elseif not EREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and QREADY then
-                self:UseQRooted(aweonao)
-            elseif not QREADY and RREADY then
-                self:UseR()
-            elseif not RREADY and EREADY then
-                self:UseE(aweonao)
-			elseif not EREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and QREADY then
-                self:UseQRooted(aweonao)
-            elseif not QREADY and RREADY then
-                self:UseR()
-            elseif not RREADY and EREADY then
-                self:UseE(aweonao)
-			elseif not EREADY and WREADY then
-                self:UseW(aweonao)
-            elseif not WREADY and QREADY then
-                self:UseQRooted(aweonao)
-            elseif not QREADY and RREADY then
-                self:UseR()
-            elseif not RREADY and EREADY then
-                self:UseE(aweonao)
-            end
-	end
-end
-
 
 -- :')
 function Ryze:LimpiezaCtm()     
