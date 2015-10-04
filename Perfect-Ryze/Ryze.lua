@@ -94,9 +94,6 @@ function Ryze:Valores()
 	RREADY = CanUseSpell(myHero, _R) == READY
 	Stacks = GotBuff(myHero, "ryzepassivestack")
 	Pasiva = GotBuff(myHero, "ryzepassivecharged")
-	PerfectQ = 60 * GetCastLevel(myHero, _Q) + 0.55*GetBonusAP(myHero) + 0.015*GetMaxMana(myHero) + 0.005*GetCastLevel(myHero,_Q)*GetMaxMana(myHero)
-	PerfectW = 80 * GetCastLevel(myHero, _W) + 0.4*GetBonusAP(myHero) + 0.025*GetMaxMana(myHero)
-	PerfectE = 36 * GetCastLevel(myHero, _E) + 0.2*GetBonusAP(myHero) + 0.02*GetMaxMana(myHero)
 end
 
 function Ryze:Drawings()
@@ -123,36 +120,36 @@ function Ryze:spellz()
 	elseif GetLevel(myHero) == 3 then
 		LevelSpell(_E)
 	elseif GetLevel(myHero) == 4 then
-        LevelSpell(_Q)
+        	LevelSpell(_Q)
 	elseif GetLevel(myHero) == 5 then
-        LevelSpell(_W)
+        	LevelSpell(_W)
 	elseif GetLevel(myHero) == 6 then
 		LevelSpell(_R)
 	elseif GetLevel(myHero) == 7 then
 		LevelSpell(_Q)
 	elseif GetLevel(myHero) == 8 then
-        LevelSpell(_Q)
+        	LevelSpell(_Q)
 	elseif GetLevel(myHero) == 9 then
-        LevelSpell(_Q)
+        	LevelSpell(_Q)
 	elseif GetLevel(myHero) == 10 then
-        LevelSpell(_W)
+        	LevelSpell(_W)
 	elseif GetLevel(myHero) == 11 then
-        LevelSpell(_R)
+        	LevelSpell(_R)
 	elseif GetLevel(myHero) == 12 then
-        LevelSpell(_W)
+        	LevelSpell(_W)
 	elseif GetLevel(myHero) == 13 then
-        LevelSpell(_E)
+        	LevelSpell(_E)
 	elseif GetLevel(myHero) == 14 then
-        LevelSpell(_W)
+        	LevelSpell(_W)
 	elseif GetLevel(myHero) == 15 then
-        LevelSpell(_E)
+        	LevelSpell(_E)
 	elseif GetLevel(myHero) == 16 then
-        LevelSpell(_R)
+		LevelSpell(_R)
 	elseif GetLevel(myHero) == 17 then
-        LevelSpell(_E)
+        	LevelSpell(_E)
 	elseif GetLevel(myHero) == 18 then
-        LevelSpell(_E)
-		end
+        	LevelSpell(_E)
+	end
 end
 
 function Ryze:AutoIgnite()
@@ -168,6 +165,7 @@ end
 
 function Ryze:AutoQ(aweonao1)
 	for _, aweonao1 in pairs(GoS:GetEnemyHeroes()) do
+		local PerfectQ = 60 * GetCastLevel(myHero, _Q) + 0.55*GetBonusAP(myHero) + 0.015*GetMaxMana(myHero) + 0.005*GetCastLevel(myHero,_Q)*GetMaxMana(myHero)
 		local aweonao2 = GetCurrentHP(aweonao1)
 		local ctm = GoS:CalcDamage(myHero, aweonao1, 0, PerfectQ)
 		local Predazo1 = GetPredictionForPlayer(GoS:myHeroPos(),aweonao1,GetMoveSpeed(aweonao1),1700,250,900,50,true,true)
@@ -179,6 +177,7 @@ end
 
 function Ryze:AutoW(aweonao3)
 	for _, aweonao3 in pairs(GoS:GetEnemyHeroes()) do
+		local PerfectW = 80 * GetCastLevel(myHero, _W) + 0.4*GetBonusAP(myHero) + 0.025*GetMaxMana(myHero)
 		local aweonao4 = GetCurrentHP(aweonao3)
 		local ctm2 = GoS:CalcDamage(myHero, aweonao3, 0, PerfectW)
 		if WREADY and ((aweonao4 - 3) < ctm2) and GoS:ValidTarget(aweonao3, 600) then
@@ -189,6 +188,7 @@ end
 
 function Ryze:AutoE(aweonao5)
 	for _, aweonao5 in pairs(GoS:GetEnemyHeroes()) do
+		local PerfectE = 36 * GetCastLevel(myHero, _E) + 0.2*GetBonusAP(myHero) + 0.02*GetMaxMana(myHero)
 		local aweonao6 = GetCurrentHP(aweonao5)
 		local ctm3 = GoS:CalcDamage(myHero, aweonao5, 0, PerfectE)
 		if EREADY and ((aweonao6 - 3) < ctm3) and GoS:ValidTarget(aweonao5, 600) then
