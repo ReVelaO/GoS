@@ -48,8 +48,6 @@ Kappa.Misc:Boolean("poderes", "Auto - Level Spells", true)
 end
 
 function Ryze:Loop(myHero)
-self:Valores()
-
 	if Kappa.KS.es1:Value() then
 		if Kappa.KS.AQ:Value() then
 		self:AutoQ()
@@ -84,16 +82,6 @@ self:Valores()
 	if _G.IOW:Mode() == "Combo" then 
 	self:Combo()
 	end
-end
-
-function Ryze:Valores()
-	aweonao = IOW:GetTarget()
-	QREADY = CanUseSpell(myHero, _Q) == READY
-	WREADY = CanUseSpell(myHero, _W) == READY
-	EREADY = CanUseSpell(myHero, _E) == READY
-	RREADY = CanUseSpell(myHero, _R) == READY
-	Stacks = GotBuff(myHero, "ryzepassivestack")
-	Pasiva = GotBuff(myHero, "ryzepassivecharged")
 end
 
 function Ryze:Drawings()
@@ -169,7 +157,7 @@ function Ryze:AutoQ(aweonao1)
 		local aweonao2 = GetCurrentHP(aweonao1)
 		local ctm = GoS:CalcDamage(myHero, aweonao1, 0, PerfectQ)
 		local Predazo1 = GetPredictionForPlayer(GoS:myHeroPos(),aweonao1,GetMoveSpeed(aweonao1),1700,250,900,50,true,true)
-		if QREADY and ((aweonao2 - 3) < ctm) and GoS:ValidTarget(aweonao1, 900) then
+		if CanUseSpell(myHero, _Q) == READY and ((aweonao2 - 3) < ctm) and GoS:ValidTarget(aweonao1, 900) then
 			CastSkillShot(_Q,Predazo1.PredPos.x,Predazo1.PredPos.y,Predazo1.PredPos.z)
 		end
 	end
@@ -180,7 +168,7 @@ function Ryze:AutoW(aweonao3)
 		local PerfectW = 80 * GetCastLevel(myHero, _W) + 0.4*GetBonusAP(myHero) + 0.025*GetMaxMana(myHero)
 		local aweonao4 = GetCurrentHP(aweonao3)
 		local ctm2 = GoS:CalcDamage(myHero, aweonao3, 0, PerfectW)
-		if WREADY and ((aweonao4 - 3) < ctm2) and GoS:ValidTarget(aweonao3, 600) then
+		if CanUseSpell(myHero, _W) == READY and ((aweonao4 - 3) < ctm2) and GoS:ValidTarget(aweonao3, 600) then
 			CastTargetSpell(aweonao3, _W)
 		end
 	end
@@ -191,99 +179,104 @@ function Ryze:AutoE(aweonao5)
 		local PerfectE = 36 * GetCastLevel(myHero, _E) + 0.2*GetBonusAP(myHero) + 0.02*GetMaxMana(myHero)
 		local aweonao6 = GetCurrentHP(aweonao5)
 		local ctm3 = GoS:CalcDamage(myHero, aweonao5, 0, PerfectE)
-		if EREADY and ((aweonao6 - 3) < ctm3) and GoS:ValidTarget(aweonao5, 600) then
+		if CanUseSpell(myHero, _E) == READY and ((aweonao6 - 3) < ctm3) and GoS:ValidTarget(aweonao5, 600) then
 			CastTargetSpell(aweonao5, _E)
 		end
 	end
 end
 
-function Ryze:UseQPred(aweonao)
-	local QPred = GetPredictionForPlayer(GoS:myHeroPos(),aweonao,GetMoveSpeed(aweonao),1700,250,900,50,false,true)		
-	if QREADY and QPred.HitChance == 1 then
+function Ryze:UseQPred(target)
+	local target = IOW:GetTarget()
+	local QPred = GetPredictionForPlayer(GoS:myHeroPos(),target,GetMoveSpeed(target),1700,250,900,50,false,true)		
+	if CanUseSpell(myHero, _Q) == READY and QPred.HitChance == 1 then
 	CastSkillShot(_Q,QPred.PredPos.x,QPred.PredPos.y,QPred.PredPos.z)
 	end
 end
 
-function Ryze:UseQRooted(aweonao)
-	local posicion = GetOrigin(aweonao)		
-	if QREADY then
+function Ryze:UseQRooted(target)
+	local target = IOW:GetTarget()
+	local posicion = GetOrigin(target)		
+	if CanUseSpell(myHero, _Q) == READY then
 	CastSkillShot(_Q,posicion.x,posicion.y,posicion.z)
 	end
 end
 
-function Ryze:UseW(aweonao)
-	if WREADY then
-	CastTargetSpell(aweonao, _W)
-	end
+function Ryze:UseW(target)
+	local target = IOW:GetTarget()
+	CastTargetSpell(target, _W)
 end
 
-function Ryze:UseE(aweonao)
-	if EREADY then
-	CastTargetSpell(aweonao, _E)
-	end
+function Ryze:UseE(target)
+	local target = IOW:GetTarget()
+	CastTargetSpell(target, _E)
 end
 
 function Ryze:UseR()
-	if RREADY and Pasiva == 1 or Stacks >= 4 then
+	local Stacks = GotBuff(myHero, "ryzepassivestack")
+	local Pasiva = GotBuff(myHero, "ryzepassivecharged")
+	if Pasiva == 1 or Stacks >= 4 then
 	CastSpell(_R)
 	end
 end
 
 function Ryze:Combo()
-	if GoS:ValidTarget(aweonao, 900) then
+	local target = IOW:GetTarget()
+	local Stacks = GotBuff(myHero, "ryzepassivestack")
+	local Pasiva = GotBuff(myHero, "ryzepassivecharged")
+	if GoS:ValidTarget(target, 900) then
 		if Stacks <= 2 and Pasiva == 0 then
-				if QREADY then
-				self:UseQPred(aweonao)
+				if CanUseSpell(myHero, _Q) == READY then
+				self:UseQPred(target)
 				end
-				if WREADY then
-				self:UseW(aweonao)
+				if CanUseSpell(myHero, _W) == READY then
+				self:UseW(target)
 				end
-				if EREADY then
-				self:UseE(aweonao)
+				if CanUseSpell(myHero, _E) == READY then
+				self:UseE(target)
 				end
-				if RREADY then
+				if CanUseSpell(myHero, _R) == READY then
 				self:UseR()
 				end
 		end
 		if Stacks == 3 then
-				if QREADY then
-				self:UseQPred(aweonao)
+				if CanUseSpell(myHero, _Q) == READY then
+				self:UseQPred(target)
 				end
-				if EREADY then
-				self:UseE(aweonao)
+				if CanUseSpell(myHero, _E) == READY then
+				self:UseE(target)
 				end
-				if WREADY then
-				self:UseW(aweonao)
+				if CanUseSpell(myHero, _W) == READY then
+				self:UseW(target)
 				end
-				if RREADY then
+				if CanUseSpell(myHero, _R) == READY then
 				self:UseR()
 				end
 		end
 		if Stacks == 4 then
-				if WREADY then
-				self:UseW(aweonao)
+				if CanUseSpell(myHero, _W) == READY then
+				self:UseW(target)
 				end
-				if QREADY then
-				self:UseQRooted(aweonao)
+				if CanUseSpell(myHero, _Q) == READY then
+				self:UseQRooted(target)
 				end
-				if EREADY then
-				self:UseE(aweonao)
+				if CanUseSpell(myHero, _E) == READY then
+				self:UseE(target)
 				end
-				if RREADY then
+				if CanUseSpell(myHero, _R) == READY then
 				self:UseR()
 				end
 		end
 		if Pasiva == 1 then
-				if WREADY then 
-				self:UseW(aweonao)
+				if CanUseSpell(myHero, _W) == READY then 
+				self:UseW(target)
 				end
-				if QREADY then
-				self:UseQRooted(aweonao)
+				if CanUseSpell(myHero, _Q) == READY then
+				self:UseQRooted(target)
 				end
-				if EREADY then
-				self:UseE(aweonao)
+				if CanUseSpell(myHero, _E) == READY then
+				self:UseE(target)
 				end
-				if RREADY then
+				if CanUseSpell(myHero, _R) == READY then
 				self:UseR()
 				end
 			end
@@ -295,19 +288,19 @@ function Ryze:LimpiezaCtm()
                 for i,minion in pairs(GoS:GetAllMinions(MINION_ENEMY)) do    
                         if GoS:ValidTarget(minion, 600) then
 							local PMinion = GetOrigin(minion)
-							if WREADY and Kappa.lc.lw:Value() then
+							if CanUseSpell(myHero, _W) and Kappa.lc.lw:Value() then
 							CastTargetSpell(minion, _W)
 							end
 						
-							if QREADY and Kappa.lc.lq:Value() then
+							if CanUseSpell(myHero, _Q) and Kappa.lc.lq:Value() then
 							CastSkillShot(_Q,PMinion.x,PMinion.y,PMinion.z)
 							end							
 						
-							if EREADY and Kappa.lc.le:Value() then
+							if CanUseSpell(myHero, _E) and Kappa.lc.le:Value() then
 							CastTargetSpell(minion, _E) 
 							end							
              
-							if RREADY and Kappa.lc.lr:Value() then
+							if CanUseSpell(myHero, _R) and Kappa.lc.lr:Value() then
 							CastSpell(_R)			 
 							end
 							
@@ -316,19 +309,19 @@ function Ryze:LimpiezaCtm()
 				for i,jungle in pairs(GoS:GetAllMinions(MINION_JUNGLE)) do    
                         if GoS:ValidTarget(jungle, 600) then
 							local PJungle = GetOrigin(jungle)
-							if WREADY and Kappa.jc.jw:Value() then
+							if CanUseSpell(myHero, _W) and Kappa.jc.jw:Value() then
 							CastTargetSpell(jungle, _W)
 							end
 						
-							if QREADY and Kappa.jc.jq:Value() then
+							if CanUseSpell(myHero, _Q) and Kappa.jc.jq:Value() then
 							CastSkillShot(_Q,PJungle.x,PJungle.y,PJungle.z)
 							end		
 						
-							if EREADY and Kappa.jc.je:Value() then
+							if CanUseSpell(myHero, _E) and Kappa.jc.je:Value() then
 							CastTargetSpell(jungle, _E)
 							end 		
              
-							if RREADY and Kappa.jc.jr:Value() then
+							if CanUseSpell(myHero, _R) and Kappa.jc.jr:Value() then
 							CastSpell(_R)			 
 							end
 						end
