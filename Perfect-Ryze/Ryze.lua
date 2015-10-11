@@ -1,5 +1,8 @@
 -- Codeado por un chileno ykpz.
 -- Feel free to PM me (DarkFight)
+require ('Inspired')
+require ('IOW')
+
 
 supportedHero = {["Ryze"] = true}
 
@@ -288,19 +291,19 @@ function Ryze:LimpiezaCtm()
                 for i,minion in pairs(GoS:GetAllMinions(MINION_ENEMY)) do    
                         if GoS:ValidTarget(minion, 600) then
 							local PMinion = GetOrigin(minion)
-							if CanUseSpell(myHero, _W) and Kappa.lc.lw:Value() then
+							if CanUseSpell(myHero, _W) == READY and Kappa.lc.lw:Value() then
 							CastTargetSpell(minion, _W)
 							end
 						
-							if CanUseSpell(myHero, _Q) and Kappa.lc.lq:Value() then
+							if CanUseSpell(myHero, _Q) == READY and Kappa.lc.lq:Value() then
 							CastSkillShot(_Q,PMinion.x,PMinion.y,PMinion.z)
 							end							
 						
-							if CanUseSpell(myHero, _E) and Kappa.lc.le:Value() then
+							if CanUseSpell(myHero, _E) == READY and Kappa.lc.le:Value() then
 							CastTargetSpell(minion, _E) 
 							end							
              
-							if CanUseSpell(myHero, _R) and Kappa.lc.lr:Value() then
+							if CanUseSpell(myHero, _R) == READY and Kappa.lc.lr:Value() then
 							CastSpell(_R)			 
 							end
 							
@@ -309,19 +312,19 @@ function Ryze:LimpiezaCtm()
 				for i,jungle in pairs(GoS:GetAllMinions(MINION_JUNGLE)) do    
                         if GoS:ValidTarget(jungle, 600) then
 							local PJungle = GetOrigin(jungle)
-							if CanUseSpell(myHero, _W) and Kappa.jc.jw:Value() then
+							if CanUseSpell(myHero, _W) == READY and Kappa.jc.jw:Value() then
 							CastTargetSpell(jungle, _W)
 							end
 						
-							if CanUseSpell(myHero, _Q) and Kappa.jc.jq:Value() then
+							if CanUseSpell(myHero, _Q) == READY and Kappa.jc.jq:Value() then
 							CastSkillShot(_Q,PJungle.x,PJungle.y,PJungle.z)
 							end		
 						
-							if CanUseSpell(myHero, _E) and Kappa.jc.je:Value() then
+							if CanUseSpell(myHero, _E) == READY and Kappa.jc.je:Value() then
 							CastTargetSpell(jungle, _E)
 							end 		
              
-							if CanUseSpell(myHero, _R) and Kappa.jc.jr:Value() then
+							if CanUseSpell(myHero, _R) == READY and Kappa.jc.jr:Value() then
 							CastSpell(_R)			 
 							end
 						end
