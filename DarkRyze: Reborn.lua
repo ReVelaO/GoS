@@ -24,7 +24,7 @@ OnProcessSpellComplete(function(Object, spell)
   end
 end)
 
-dr = MenuConfig("[DarkTeam] Ryze", "DarkTeam")
+dr = MenuConfig("DarkRyze: Reborn", "DarkTeam")
 dr:Menu("Combo", "Combo")
 dr.Combo:Info("info1", "Combo! (Space key)")
 
