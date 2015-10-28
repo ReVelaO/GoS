@@ -314,16 +314,16 @@ end
 
 function Ryze:LastHit()
   for i,minion in pairs(minionManager.objects) do    
-    if IsInDistance(minion, 900) then
+    if ValidTarget(minion, 900) then
     local Predazo1 = GetPredictionForPlayer(myHeroPos(),minion,GetMoveSpeed(minion),1700,250,900,50,true,true)
     local SpellDamage = 60 * GetCastLevel(myHero, _Q) + 0.55*GetBonusAP(myHero) + 0.015*GetMaxMana(myHero) + 0.005*GetCastLevel(myHero,_Q)*GetMaxMana(myHero)
-		local Health = GetCurrentHP(minion)
-		local Calcs = CalcDamage(myHero, minion, 0, SpellDamage)
+    local Health = GetCurrentHP(minion)
+    local Calcs = CalcDamage(myHero, minion, 0, SpellDamage)
       if CanUseSpell(myHero, _Q) == READY and dr.lh.lhq:Value() and GetPercentMP(myHero) >= dr.lh.ms:Value() and Health <= Calcs then
         CastSkillShot(_Q,Predazo1.PredPos.x,Predazo1.PredPos.y,Predazo1.PredPos.z)
       end
-		end
 	end
+   end
 end
 
 function Ryze:LimpiezaCtm()     
