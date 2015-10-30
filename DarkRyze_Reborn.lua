@@ -24,7 +24,7 @@ OnProcessSpellComplete(function(Object, spell)
   end
 end)
 
-dr = MenuConfig("DarkRyze: Reborn", "DarkTeam")
+dr = MenuConfig("[DarkTeam] Ryze", "DarkTeam")
 dr:Menu("Combo", "Combo")
 dr.Combo:Info("info1", "Combo! (Space key)")
 
@@ -315,15 +315,14 @@ end
 function Ryze:LastHit()
   for i,minion in pairs(minionManager.objects) do    
     if ValidTarget(minion, 900) then
-    local Predazo1 = GetPredictionForPlayer(myHeroPos(),minion,GetMoveSpeed(minion),1700,250,900,50,true,true)
+    local PosM = GetOrigin(minion)
     local SpellDamage = 60 * GetCastLevel(myHero, _Q) + 0.55*GetBonusAP(myHero) + 0.015*GetMaxMana(myHero) + 0.005*GetCastLevel(myHero,_Q)*GetMaxMana(myHero)
-    local Health = GetCurrentHP(minion)
-    local Calcs = CalcDamage(myHero, minion, 0, SpellDamage)
-      if CanUseSpell(myHero, _Q) == READY and dr.lh.lhq:Value() and GetPercentMP(myHero) >= dr.lh.ms:Value() and Health <= Calcs then
-        CastSkillShot(_Q,Predazo1.PredPos.x,Predazo1.PredPos.y,Predazo1.PredPos.z)
+		local Calcs = CalcDamage(myHero, minion, 0, SpellDamage)
+      if CanUseSpell(myHero, _Q) == READY and dr.lh.lhq:Value() and GetPercentMP(myHero) >= dr.lh.ms:Value() and (GetCurrentHP(minion) - 5) <= Calcs then
+        CastSkillShot(_Q,PosM.x,PosM.y,PosM.z)
       end
+		end
 	end
-   end
 end
 
 function Ryze:LimpiezaCtm()     
