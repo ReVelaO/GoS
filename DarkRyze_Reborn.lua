@@ -1,7 +1,7 @@
 --[[Codeado por un chileno ykpz.
 Feel free to PM me (DarkFight)
 Updated to New API.
-Version: 1.0.0.7, Clean code.
+Version: 1.0.0.6, Clean code.
 ]]--
 require ('Inspired')
 supportedHero = {["Ryze"] = true}
