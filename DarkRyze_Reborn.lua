@@ -63,7 +63,7 @@ dr.Drawings:Slider("dp", "Quality circles", 255, 1, 255, 1)
 dr:Menu("Misc", "Misc")
 dr.Misc:Boolean("es3", "Enable Miscs", true)
 dr.Misc:Boolean("fuego", "Auto - Ignite", true)
-dr.Misc:Boolean("poderes", "Auto - Level Spells", true)
+dr.Misc:Boolean("poderes", "Auto - Level Spells", false)
 
 end
 function Ryze:OnLoad(myHero)
