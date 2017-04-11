@@ -27,7 +27,7 @@ function IsInRange(target, me, range)
 	return false
 end
 
-local function OnTick()
+local OnTick = function()
 
 	if (myHero.dead) then return end
 
@@ -53,6 +53,4 @@ local function OnTick()
 end
 
 -- ONTICK FUNCTION
-Callback.Add("Tick", function()
-	OnTick()
-end)
+Callback.Add("Tick", function() OnTick() end)
