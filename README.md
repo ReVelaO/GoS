@@ -1,3 +1,5 @@
-# GoS
+Scripts for GoS Plataform
+---
 
-Currently working on Ryze script.
+(14/04/2017) Working on:
+1. Ryze
