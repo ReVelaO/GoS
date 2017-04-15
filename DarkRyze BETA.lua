@@ -20,7 +20,7 @@ menu:MenuElement({type = MENU, name = "Combo Settings", id = "combo"})
 menu.combo:MenuElement({name = "Overload [Q]", id = "useq", leftIcon = Icons.Q, value = true})
 menu.combo:MenuElement({name = "Rune Prison [W]", id = "usew", leftIcon = Icons.W, value = true})
 menu.combo:MenuElement({name = "Spell Flux [E]", id = "usee", leftIcon = Icons.E, value = true})
-menu.combo:MenuElement({name = "Ignite", id = "ign", leftIcon = Icons.Ignite, value = true})
+--menu.combo:MenuElement({name = "Ignite", id = "ign", leftIcon = Icons.Ignite, value = true})
 
 menu:MenuElement({type = MENU, name = "Laneclear Settings", id = "laneclear"})
 menu.laneclear:MenuElement({name = "Overload [Q]", id = "lcuseq", leftIcon = Icons.Q, value = true})
@@ -105,7 +105,7 @@ local Combo = function()
 			end
 	end
 end
-
+--[[
 local AutoIgnite = function()
 
 	local Ignite = _G.SDK.Utilities:GetSlotFromName(myHero, "SummonerDot")
@@ -125,7 +125,7 @@ local AutoIgnite = function()
 
 		end
 	end
-end
+end]]
 
 local Laneclear = function()
 
@@ -178,7 +178,7 @@ local OnTick = function()
 
 	if (myHero.dead) then return end
 
-	AutoIgnite()
+	--AutoIgnite()
 
 	if (_G.SDK.Orbwalker.Modes[_G.SDK.ORBWALKER_MODE_COMBO]) then
 		Combo()
