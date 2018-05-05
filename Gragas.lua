@@ -197,7 +197,7 @@ function Gragas:Combo()
 		end
 	end
 
-	if self.Menu.Combo.W:Value() and IsReady(_W) and Geometry:GetDistance(myHero.pos, _target.pos) >= 800 then
+	if self.Menu.Combo.W:Value() and IsReady(_W) and (myHero.health/myHero.maxHealth*100 < _target.health/_target.maxHealth*100 and Geometry:GetDistance(myHero.pos, _target.pos) >= 800 or true) then
 		Control.CastSpell(HK_W)
 	end
 end
@@ -305,14 +305,14 @@ function Gragas:RAlgorithm()
 
 	if insecPos == nil then
 		if self.LastBarrel.Valid then
-			if IsImmobile(target) or IsKnocked(target) then
+			if IsImmobile(target) or IsKnocked(target) and not IsKnockedBack(target) then
 				local pos = self:GetRPos(target)
 
 				if pos == nil then
 					return
 				end
 
-				if Geometry:GetDistance(myHero.pos, pos) <= self.R.Range and Geometry:GetDistance(target.pos, self.LastBarrel.Position) < 900 then
+				if Geometry:GetDistance(myHero.pos, pos) <= self.R.Range and Geometry:GetDistance(target.pos, self.LastBarrel.Position) <= 800 then
 					Control.CastSpell(HK_R, pos)
 				end
 			else
@@ -322,7 +322,8 @@ function Gragas:RAlgorithm()
 	end
 
 	if self.LastBarrel.Valid then
-		if insecPos ~= nil and Geometry:GetDistance(myHero.pos, insecPos) <= self.R.Range and Geometry:GetDistance(target.pos, self.LastBarrel.Position) < 900 then
+		if insecPos ~= nil and Geometry:GetDistance(myHero.pos, insecPos) <= self.R.Range and Geometry:GetDistance(target.pos, self.LastBarrel.Position) <= 800 
+			and not IsKnockedBack(target) then
 			Control.CastSpell(HK_R, insecPos)
 		end
 	end
