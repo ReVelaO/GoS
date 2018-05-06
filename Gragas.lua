@@ -47,6 +47,12 @@ function IsReady(islot)
 	return _data.currentCd == 0 and _data.level > 0 and _data.mana <= myHero.mana and Game.CanUseSpell(islot) == READY
 end
 
+function Distance(pos1, pos2)
+	local _pos1 = Vector(pos1)
+	local _pos2 = Vector(pos2)
+	return _pos1:DistanceTo(_pos2)
+end
+
 class "Gragas"
 
 function Gragas:__init()
@@ -66,7 +72,6 @@ function Gragas:__init()
 
 
 	self.Menu = MenuElement({type = MENU, id = "main", name = "Guaton", leftIcon = self.Icons.Pic})
-	self.Menu:MenuElement({id = "key", name = "Key", key = string.byte("T")})
 
 	self.Menu:MenuElement({type = MENU, id = "Combo", name = "Combo"})
 	self.Menu.Combo:MenuElement({id = "Q", name = "Barrel Roll", leftIcon = self.Icons.Q, value = true})
@@ -74,8 +79,10 @@ function Gragas:__init()
 	self.Menu.Combo:MenuElement({id = "W", name = "Drunken Rage", leftIcon = self.Icons.W, value = true})
 	self.Menu.Combo:MenuElement({id = "E", name = "Body Slam", leftIcon = self.Icons.E, value = true})
 	self.Menu.Combo:MenuElement({id = "R", name = "Explosive Cask", leftIcon = self.Icons.R, value = true})
+	self.Menu.Combo:MenuElement({id = "key", name = "Combo", key = string.byte(" ")})
+	self.Menu.Combo:MenuElement({id = "_key", name = "Burst", key = string.byte("T")})
 
-	self.LastBarrel = { Valid = false, Position = nil }
+	self.LastBarrel = { Valid = false, Position = nil, Timer = 0 }
 
 	self.Q = { Range = 850, Delay = 500, Speed = 1000, Width = 250 }
 	self.E = { Range = 600, Delay = 0, Speed = 900, Width = 180 }
@@ -85,6 +92,7 @@ function Gragas:__init()
 		if particle.valid and particle.name == "Gragas_Base_Q_Ally" then
 			self.LastBarrel.Valid = true
 			self.LastBarrel.Position = particle.pos
+			self.LastBarrel.Timer = GetTickCount()
 		end
 	end)
 
@@ -110,11 +118,15 @@ function Gragas:OnTick()
 		return
 	end
 
-	if self.Menu.key:Value() then
+	if self.Menu.Combo.key:Value() then
 		self:Combo()
 		if self.Menu.Combo.R:Value() then
 			self:RAlgorithm()
 		end
+	end
+
+	if self.Menu.Combo._key:Value() then
+		self:BurstCombo()
 	end
 
 	if self.LastBarrel.Valid and self.Menu.Combo.Q2:Value() then
@@ -139,6 +151,25 @@ function Gragas:OnDraw()
 	end
 
 	Draw.Circle(myHero.pos, self.R.Range, Draw.Color(255, 255, 255, 255))
+end
+
+function PrintBuffs(unit) --// From t01 yasuo men pls i'm too lazy
+	for i = 0, unit.buffCount do
+		local buff = unit:GetBuff(i)
+		if buff and buff.count > 0 then
+			PrintChat(buff.name)
+		end
+	end
+end
+
+function HasBuff(unit,buff) --// From t01 yasuo men pls i'm too lazy
+	for i = 0, unit.buffCount do
+		local buff = unit:GetBuff(i)
+		if buff and buff.name:lower() == buff and buff.count > 0 then
+			return true
+		end
+	end
+	return false
 end
 
 function IsImmobile(unit) --// From t01 yasuo men pls i'm too lazy
@@ -182,23 +213,65 @@ function Gragas:Combo()
 		return
 	end
 
+
+
+	if self.Menu.Combo.W:Value() and IsReady(_W) and (myHero.health/myHero.maxHealth*100 < _target.health/_target.maxHealth*100 and Distance(myHero.pos, _target.pos) >= 800 or true) then
+		Control.CastSpell(HK_W)
+	end
+
+	if self.Menu.Combo.E:Value() and IsReady(_E) and not self:IsInBarrel(myHero) then
+		local c = _target:GetCollision(self.E.Width, self.E.Speed, self.E.Delay)
+
+		if (c == 0 or Distance(myHero.pos, _target.pos) <= 100) and Distance(myHero.pos, _target.pos) <= self.E.Range then
+			Control.CastSpell(HK_E, _target.pos)
+		end
+	end
+
 	if self.Menu.Combo.Q:Value() and IsReady(_Q) and myHero:GetSpellData(_Q).name:lower() == "gragasq" then --and IsReady(_R) == false then
 		local h, aP = HPred:GetHitchance(myHero.pos, _target, self.Q.Range, self.Q.Delay, self.Q.Speed, self.Q.Width, false)
 		if h and aP and h > 0 then
 			Control.CastSpell(HK_Q, aP)
 		end
 	end
+end
 
-	if self.Menu.Combo.E:Value() and IsReady(_E) and not self:IsInBarrel(myHero) then
-		local c = _target:GetCollision(self.E.Width, self.E.Speed, self.E.Delay)
+function Gragas:BurstCombo()
+	local target = _G.SDK.TargetSelector:GetTarget(1000, _G.SDK.DAMAGE_TYPE_MAGICAL)
 
-		if (c == 0 or Geometry:GetDistance(myHero.pos, _target.pos) <= 100) and Geometry:GetDistance(myHero.pos, _target.pos) <= 600 then
-			Control.CastSpell(HK_E, _target.pos)
+	if target == nil or target.isImmortal then
+		return
+	end
+
+	if self.Menu.Combo.W:Value() and IsReady(_W) then
+		Control.CastSpell(HK_W)
+	end
+
+	if self.Menu.Combo.E:Value() and IsReady(_E) and myHero:GetSpellData(_W).currentCd == 0 then
+		local c = target:GetCollision(self.E.Width, self.E.Speed, self.E.Delay)
+
+		if (c == 0 or Distance(myHero.pos, target.pos) <= 150) and Distance(myHero.pos, target.pos) <= self.E.Range then
+			Control.CastSpell(HK_E, target.pos)
 		end
 	end
 
-	if self.Menu.Combo.W:Value() and IsReady(_W) and (myHero.health/myHero.maxHealth*100 < _target.health/_target.maxHealth*100 and Geometry:GetDistance(myHero.pos, _target.pos) >= 800 or true) then
-		Control.CastSpell(HK_W)
+	if self.Menu.Combo.Q:Value() and IsReady(_Q) and myHero:GetSpellData(_Q).name:lower() == "gragasq" and not IsReady(_E) then --and IsReady(_R) == false then
+		local h, aP = HPred:GetHitchance(myHero.pos, target, self.Q.Range, self.Q.Delay, self.Q.Speed, self.Q.Width, false)
+		if h and aP and h > 0 then
+			Control.CastSpell(HK_Q, aP)
+		end
+	end
+
+	if Distance(myHero.pos, target.pos) <= 200 then
+		Control.Attack(target)
+	end
+
+	if self.LastBarrel.Valid and myHero:GetSpellData(_Q).toggleState == 2 and IsReady(_Q) and self:IsInBarrel(target) then
+		Control.CastSpell(HK_Q)
+	end
+
+	if IsImmobile(target) or IsKnockedBack(target) and IsReady(_R) then
+		local _pos = self:GetRPosByPos(target, myHero.pos)
+		Control.CastSpell(HK_R, _pos)
 	end
 end
 
@@ -206,7 +279,7 @@ function Gragas:GetEnemies()
 	local _enemies = {}
 	for i = 1, Game.HeroCount() do
 		local hero = Game.Hero(i)
-		if hero and hero.valid and hero.visible and hero.isEnemy and not hero.isImmortal and not hero.dead and Geometry:GetDistance(hero.pos, myHero.pos) <= self.R.Range then
+		if hero and hero.valid and hero.visible and hero.isEnemy and not hero.isImmortal and not hero.dead and Distance(hero.pos, myHero.pos) <= self.R.Range then
 			table.insert(_enemies, hero)
 		end
 	end
@@ -261,6 +334,17 @@ function Gragas:GetRPos(unit)
 	return Vector(unit.pos + b)
 end
 
+function Gragas:GetRPosByPos(unit, pos)
+
+	if self.LastBarrel.Valid == false or pos == nil then
+		return
+	end
+
+	local a = Vector(unit.pos - pos)
+	local b = a:Normalized() * ((self.R.Width / 2) + 50)
+	return Vector(unit.pos + b)
+end
+
 function Gragas:GetRPosPredicted(unit)
 	if self.LastBarrel.Valid == false or self.LastBarrel.Position == nil then
 		return
@@ -268,7 +352,7 @@ function Gragas:GetRPosPredicted(unit)
 
 	local h, aP = HPred:GetHitchance(myHero.pos, unit, self.R.Range, self.R.Delay, self.R.Speed, self.R.Width, false)
 	
-	if h > 1 then
+	if h > 0 then
 		local a = Vector(aP - self.LastBarrel.Position)
 		local b = a:Normalized() * ((self.R.Width / 2) + 50)
 		return Vector(aP + b)
@@ -283,7 +367,7 @@ function Gragas:RAlgorithm()
 		return
 	end
 
-	local target = _G.SDK.TargetSelector:GetTarget(1000, _G.SDK.DAMAGE_TYPE_MAGICAL)
+	local target =  _G.SDK.TargetSelector:GetTarget(1000, _G.SDK.DAMAGE_TYPE_MAGICAL)
 
 	if target == nil then
 		return
@@ -312,7 +396,7 @@ function Gragas:RAlgorithm()
 					return
 				end
 
-				if Geometry:GetDistance(myHero.pos, pos) <= self.R.Range and Geometry:GetDistance(target.pos, self.LastBarrel.Position) <= 800 then
+				if Distance(myHero.pos, pos) <= self.R.Range and Distance(target.pos, self.LastBarrel.Position) <= 800 then
 					Control.CastSpell(HK_R, pos)
 				end
 			else
@@ -322,7 +406,7 @@ function Gragas:RAlgorithm()
 	end
 
 	if self.LastBarrel.Valid then
-		if insecPos ~= nil and Geometry:GetDistance(myHero.pos, insecPos) <= self.R.Range and Geometry:GetDistance(target.pos, self.LastBarrel.Position) <= 800 
+		if insecPos ~= nil and Distance(myHero.pos, insecPos) <= self.R.Range and Distance(target.pos, self.LastBarrel.Position) <= 800 
 			and not IsKnockedBack(target) then
 			Control.CastSpell(HK_R, insecPos)
 		end
