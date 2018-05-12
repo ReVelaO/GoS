@@ -85,7 +85,8 @@ function Anivia:__init()
 	self:Spells()
 	
 	self.QObject = { isValid = false, GameObject = nil }
-	self.RObject = { isValid = false, Position = nil }
+	self.RObject = { isValid = false, Position = nil, isMaxed = false }
+	self.LastSlot = nil
 	
 	Alpha.ObjectManager:OnMissileCreate(function(missile) 
 		if missile.valid and missile.name == "FlashFrostSpell" and missile.data.missileData.owner == myHero.handle then
@@ -105,11 +106,11 @@ function Anivia:__init()
 			if particle.name:lower():find("anivia") and particle.name:lower():find("aoe_green") then
 				self.RObject.isValid = true
 				self.RObject.Position = particle.pos
-				PrintChat("Anivia R Getted!")
+				self.LastSlot = _R
 			end
 			if particle.name:lower():find("anivia") and particle.name:lower():find("full") then
 				self.R.Width = 400
-				PrintChat("Anivia R Maxed Getted!")
+				self.R.isMaxed = true
 			end
 		end
 	end)
@@ -119,7 +120,15 @@ function Anivia:__init()
 			self.RObject.isValid = false
 			self.RObject.Position = nil
 			self.R.Width = 200
-			PrintChat("R Deleted and Size Back")
+			self.R.isMaxed = false
+		end
+	end)
+	
+	_G.Alpha.ObjectManager:OnSpellCast(function(spell)
+		if spell.owner == myHero.networkID then
+			if spell.name:lower() == "flashfrostspell" then
+				self.LastSlot = _Q
+			end
 		end
 	end)
 	
@@ -299,15 +308,15 @@ function Anivia:CastE(target)
 		if self.Menu.Combo.ComboE.EMode:Value() == 1 then
 			Control.CastSpell(HK_E, target)
 		elseif self.Menu.Combo.ComboE.EMode:Value() == 2 then
-			if self:IsChilled(target) then
+			if self:IsChilled(target) and (self.LastSlot == _Q or (self.LastSlot == _R and self.R.isMaxed)) then
 				Control.CastSpell(HK_E, target)
-			elseif IsReady(_Q) == false and self.QObject.isValid == false then
+			elseif self:IsChilled(target) == false and (myHero:GetSpellData(_Q).currentCd >= 1.5 and IsReady(_Q) == false) and self.QObject.isValid == false and myHero:GetSpellData(_R).currentCd >= 2 then
 				Control.CastSpell(HK_E, target)
 			end
 		elseif self.Menu.Combo.ComboE.EMode:Value() == 3 then
-			if self:IsSmartChilled(target) then
+			if self:IsSmartChilled(target) and (self.LastSlot == _Q or (self.LastSlot == _R and self.R.isMaxed)) then
 				Control.CastSpell(HK_E, target)
-			elseif IsReady(_Q) == false and self.QObject.isValid == false then
+			elseif self:IsSmartChilled(target) == false and (myHero:GetSpellData(_Q).currentCd >= 1.5 and IsReady(_Q) == false) and self.QObject.isValid == false and myHero:GetSpellData(_R).currentCd >= 2 then
 				Control.CastSpell(HK_E, target)
 			end
 		end
@@ -392,9 +401,10 @@ function Anivia:Combo()
 			self:CastW()
 			self:CastQ()
 		else
+			--PrintChat(self:IsChilled(target))
 			self:CastQ(target)
-			self:CastE(target)
 			self:CastR(target)
+			self:CastE(target)
 			self:CastW(target)
 		end
 	end
