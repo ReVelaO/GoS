@@ -12,6 +12,10 @@ local IsReady = function(islot)
 	return Game.CanUseSpell(islot) == READY and data.currentCd == 0 and data.level > 0 and myHero.mana >= data.mana
 end
 
+local GetData = function(islot)
+	return myHero:GetSpellData(islot)
+end
+
 local GetDistance = function(xyz1,xyz2)
 	local pos1 = Vector(xyz1.x, xyz1.y, xyz1.z)
 	local pos2 = Vector(xyz2.x, xyz2.y, xyz2.z)
@@ -163,6 +167,7 @@ function Anivia:Menu()
 	self.Menu:MenuElement({ type = SPACE })
 	self.Menu:MenuElement({ type = SPACE, name = "Developer: Kiara789" })
 	self.Menu:MenuElement({ type = SPACE, name = "League: 8.9" })
+	self.Menu:MenuElement({ type = SPACE, name = "Update 1" })
 end
 
 function Anivia:Spells()
@@ -308,16 +313,40 @@ function Anivia:CastE(target)
 		if self.Menu.Combo.ComboE.EMode:Value() == 1 then
 			Control.CastSpell(HK_E, target)
 		elseif self.Menu.Combo.ComboE.EMode:Value() == 2 then
-			if self:IsChilled(target) and (self.LastSlot == _Q or (self.LastSlot == _R and self.R.isMaxed)) then
-				Control.CastSpell(HK_E, target)
-			elseif self:IsChilled(target) == false and (myHero:GetSpellData(_Q).currentCd >= 1.5 and IsReady(_Q) == false) and self.QObject.isValid == false and myHero:GetSpellData(_R).currentCd >= 2 then
+			if GetData(_Q).level == 0 and GetData(_R).level == 0 and GetData(_E).level > 0 then
 				Control.CastSpell(HK_E, target)
 			end
+			if GetData(_Q).level > 0 and GetData(_R).level == 0 and GetData(_E).level > 0 then
+				if self:IsChilled(target) then
+					Control.CastSpell(HK_E, target)
+				elseif self:IsChilled(target) == false and (myHero:GetSpellData(_Q).currentCd >= 1.5 and IsReady(_Q) == false and self.QObject.isValid == false) then
+					Control.CastSpell(HK_E, target)
+				end
+			end
+			if GetData(_Q).level > 0 and GetData(_R).level > 0 and GetData(_E).level > 0 then
+				if self:IsChilled(target) and (self.LastSlot == _Q or (self.LastSlot == _R and self.R.isMaxed)) then
+					Control.CastSpell(HK_E, target)
+				elseif self:IsChilled(target) == false and (myHero:GetSpellData(_Q).currentCd >= 1.5 and IsReady(_Q) == false) and self.QObject.isValid == false and myHero:GetSpellData(_R).currentCd >= 2 then
+					Control.CastSpell(HK_E, target)
+				end
+			end
 		elseif self.Menu.Combo.ComboE.EMode:Value() == 3 then
-			if self:IsSmartChilled(target) and (self.LastSlot == _Q or (self.LastSlot == _R and self.R.isMaxed)) then
+			if GetData(_Q).level == 0 and GetData(_R).level == 0 and GetData(_E).level > 0 then
 				Control.CastSpell(HK_E, target)
-			elseif self:IsSmartChilled(target) == false and (myHero:GetSpellData(_Q).currentCd >= 1.5 and IsReady(_Q) == false) and self.QObject.isValid == false and myHero:GetSpellData(_R).currentCd >= 2 then
-				Control.CastSpell(HK_E, target)
+			end
+			if GetData(_Q).level > 0 and GetData(_R).level == 0 and GetData(_E).level > 0 then
+				if self:IsSmartChilled(target) then
+					Control.CastSpell(HK_E, target)
+				elseif self:IsSmartChilled(target) == false and (myHero:GetSpellData(_Q).currentCd >= 1.5 and IsReady(_Q) == false and self.QObject.isValid == false) then
+					Control.CastSpell(HK_E, target)
+				end
+			end
+			if GetData(_Q).level > 0 and GetData(_R).level > 0 and GetData(_E).level > 0 then
+				if self:IsSmartChilled(target) and (self.LastSlot == _Q or (self.LastSlot == _R and self.R.isMaxed)) then
+					Control.CastSpell(HK_E, target)
+				elseif self:IsSmartChilled(target) == false and (myHero:GetSpellData(_Q).currentCd >= 1.5 and IsReady(_Q) == false) and self.QObject.isValid == false and myHero:GetSpellData(_R).currentCd >= 2 then
+					Control.CastSpell(HK_E, target)
+				end
 			end
 		end
 	end
