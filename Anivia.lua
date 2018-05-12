@@ -430,7 +430,6 @@ function Anivia:Combo()
 			self:CastW()
 			self:CastQ()
 		else
-			--PrintChat(self:IsChilled(target))
 			self:CastQ(target)
 			self:CastR(target)
 			self:CastE(target)
