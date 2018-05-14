@@ -51,6 +51,95 @@ local AngleBetween = function(vector2D, toVector2D)
     return theta;
 end
 
+local IsFacing = function(source, target)
+	if source == nil or target == nil then
+		return false
+	end
+
+	local _dir = Vector(source.dir)
+	local diff = Vector(target.pos - source.pos)
+	return AngleBetween(_dir, diff) < 90
+end
+
+local _EnemyHeroes
+function GetEnemyHeroes()
+  if _EnemyHeroes then return _EnemyHeroes end
+  for i = 1, Game.HeroCount() do
+    local unit = Game.Hero(i)
+    if unit.isEnemy then
+	  if _EnemyHeroes == nil then _EnemyHeroes = {} end
+      table.insert(_EnemyHeroes, unit)
+    end
+  end
+  return {}
+end
+
+local _OnVision = {}
+function OnVision(unit)
+	if _OnVision[unit.networkID] == nil then _OnVision[unit.networkID] = {state = unit.visible , tick = GetTickCount(), pos = unit.pos} end
+	if _OnVision[unit.networkID].state == true and not unit.visible then _OnVision[unit.networkID].state = false _OnVision[unit.networkID].tick = GetTickCount() end
+	if _OnVision[unit.networkID].state == false and unit.visible then _OnVision[unit.networkID].state = true _OnVision[unit.networkID].tick = GetTickCount() end
+	return _OnVision[unit.networkID]
+end
+Callback.Add("Tick", function() OnVisionF() end)
+local visionTick = GetTickCount()
+function OnVisionF()
+	if GetTickCount() - visionTick > 100 then
+		for i,v in pairs(GetEnemyHeroes()) do
+			OnVision(v)
+		end
+	end
+end
+
+local IsImmobileTarget = function(unit)
+	for i = 0, unit.buffCount do
+		local buff = unit:GetBuff(i)
+		if buff and (buff.type == 5 or buff.type == 11 or buff.type == 29 or buff.type == 24 or buff.name == "recall") and buff.count > 0 then
+			return true
+		end
+	end
+	return false	
+end
+
+local _OnWaypoint = {}
+local OnWaypoint = function(unit)
+	if _OnWaypoint[unit.networkID] == nil then _OnWaypoint[unit.networkID] = {pos = unit.posTo , speed = unit.ms, time = Game.Timer()} end
+	if _OnWaypoint[unit.networkID].pos ~= unit.posTo then
+		_OnWaypoint[unit.networkID] = {startPos = unit.pos, pos = unit.posTo , speed = unit.ms, time = Game.Timer()}
+			DelayAction(function()
+				local time = (Game.Timer() - _OnWaypoint[unit.networkID].time)
+				local speed = GetDistance(_OnWaypoint[unit.networkID].startPos,unit.pos)/(Game.Timer() - _OnWaypoint[unit.networkID].time)
+				if speed > 1250 and time > 0 and unit.posTo == _OnWaypoint[unit.networkID].pos and GetDistance(unit.pos,_OnWaypoint[unit.networkID].pos) > 200 then
+					_OnWaypoint[unit.networkID].speed = GetDistance(_OnWaypoint[unit.networkID].startPos,unit.pos)/(Game.Timer() - _OnWaypoint[unit.networkID].time)
+				end
+			end,0.05)
+	end
+	return _OnWaypoint[unit.networkID]
+end
+
+local GetPred = function(unit,speed,delay)
+	local speed = speed or math.huge
+	local delay = delay or 0.25
+	local unitSpeed = unit.ms
+	if OnWaypoint(unit).speed > unitSpeed then unitSpeed = OnWaypoint(unit).speed end
+	if OnVision(unit).state == false then
+		local unitPos = unit.pos + Vector(unit.pos,unit.posTo):Normalized() * ((GetTickCount() - OnVision(unit).tick)/1000 * unitSpeed)
+		local predPos = unitPos + Vector(unit.pos,unit.posTo):Normalized() * (unitSpeed * (delay + (GetDistance(myHero.pos,unitPos)/speed)))
+		if GetDistance(unit.pos,predPos) > GetDistance(unit.pos,unit.posTo) then predPos = unit.posTo end
+		return predPos
+	else
+		if unitSpeed > unit.ms then
+			local predPos = unit.pos + Vector(OnWaypoint(unit).startPos,unit.posTo):Normalized() * (unitSpeed * (delay + (GetDistance(myHero.pos,unit.pos)/speed)))
+			if GetDistance(unit.pos,predPos) > GetDistance(unit.pos,unit.posTo) then predPos = unit.posTo end
+			return predPos
+		elseif IsImmobileTarget(unit) then
+			return unit.pos
+		else
+			return unit:GetPrediction(speed,delay)
+		end
+	end
+end
+
 local castSpell = {state = 0, tick = GetTickCount(), casting = GetTickCount() - 1000, mouse = mousePos}
 local CastSpell = function(spell,pos,range,delay)
 local range = range or math.huge
@@ -65,15 +154,15 @@ local ticker = GetTickCount()
 	if castSpell.state == 1 then
 		if ticker - castSpell.tick < Game.Latency() then
 			Control.SetCursorPos(pos)
-			Control.KeyDown(spell)
-			Control.KeyUp(spell)
-			castSpell.casting = ticker + delay
-			DelayAction(function()
-				if castSpell.state == 1 then
-					Control.SetCursorPos(castSpell.mouse)
-					castSpell.state = 0
-				end
-			end,Game.Latency()/1000)
+				Control.KeyDown(spell)
+				Control.KeyUp(spell)
+				castSpell.casting = ticker + delay
+				DelayAction(function()
+					if castSpell.state == 1 then
+						Control.SetCursorPos(castSpell.mouse)
+						castSpell.state = 0
+					end
+				end,Game.Latency()/1000)
 		end
 		if ticker - castSpell.casting > Game.Latency() then
 			Control.SetCursorPos(castSpell.mouse)
@@ -139,6 +228,10 @@ function Anivia:__init()
 	Callback.Add("Tick", function() 
 		self:OnTick()
 	end)
+	
+	Callback.Add("Draw", function()
+		self:OnDraw()
+	end)
 end
 
 function Anivia:Menu()
@@ -164,6 +257,12 @@ function Anivia:Menu()
 	self.Menu.Combo.ComboE:MenuElement({ id = "UseE", name = "Frostbite", leftIcon = Icons.E, value = true })
 	self.Menu.Combo.ComboE:MenuElement({ id = "EMode", name = "Algorithm", leftIcon = Icons.E, drop = { "Always", "Fast", "Smart" }, value = 3 })
 	self.Menu.Combo:MenuElement({id = "UseR", name = "Glacial Storm", leftIcon = Icons.R, value = true })
+	self.Menu:MenuElement({ type = SPACE })
+	self.Menu:MenuElement({ type = MENU, id = "Misc", name = "Misc" })
+	self.Menu.Misc:MenuElement({id = "DrawQ", name = "Draw Flash Frost", leftIcon = Icons.Q, value = true })
+	self.Menu.Misc:MenuElement({id = "DrawE", name = "Draw Frostbite", leftIcon = Icons.E, value = true })
+	self.Menu.Misc:MenuElement({id = "DrawR", name = "Draw Glacial Storm", leftIcon = Icons.R, value = true })
+	
 	self.Menu:MenuElement({ type = SPACE })
 	self.Menu:MenuElement({ type = SPACE, name = "Developer: Kiara789" })
 	self.Menu:MenuElement({ type = SPACE, name = "League: 8.9" })
@@ -197,7 +296,7 @@ function Anivia:IsInQ2(unit)
 		return false
 	end
 	
-	if GetDistance(self.QObject.GameObject.pos, unit.pos) <= self.Q.Width2 then
+	if GetDistance(self.QObject.GameObject.pos, unit.pos) <= self.Q.Width2 + 30 then
 		return true
 	end
 end
@@ -222,11 +321,25 @@ function Anivia:CastQ(target)
 		return
 	end
 	
-	if myHero:GetSpellData(_Q).toggleState == 1 then
-		local hitchance, castpos = HPred:GetHitchance(myHero.pos, target, self.Q.Range, self.Q.Delay, self.Q.Speed, self.Q.Width, false)
+	if myHero.activeSpell and myHero.activeSpell.valid and myHero.activeSpell.isChanneling or myHero.activeSpell.isAutoAttack then
+		return
+	end
 	
-		if hitchance and castpos and hitchance > 0 then
-			CastSpell(HK_Q, castpos, self.Q.Range)
+	if myHero:GetSpellData(_Q).toggleState == 1 then
+		if IsFacing(target, myHero) then
+			CastSpell(HK_Q, target.pos, self.Q.Range)
+		end
+	
+		--local hitchance, castpos = HPred:GetHitchance(myHero.pos, target, self.Q.Range, self.Q.Delay, self.Q.Speed, self.Q.Width, false)
+		local castpos = GetPred(target, self.Q.Speed, self.Q.Delay)
+	
+		--if hitchance and castpos and hitchance > 0 and GetDistance(target.pos, castpos) <= 400 then
+		if castpos and GetDistance(castpos, myHero.pos) < self.Q.Range then
+			if castpos:To2D().onScreen then
+				CastSpell(HK_Q, castpos, self.Q.Range)
+			else
+				return
+			end
 		end
 	elseif myHero:GetSpellData(_Q).toggleState == 2 then
 		if self:IsInQ2(target) then
@@ -241,6 +354,10 @@ function Anivia:CastW(target)
 	end
 
 	if not IsReady(_W) or target == nil  or (IsReady(_Q) and self.QObject.isValid) then
+		return
+	end
+	
+	if myHero.activeSpell and myHero.activeSpell.valid and myHero.activeSpell.isChanneling or myHero.activeSpell.isAutoAttack then
 		return
 	end
 	
@@ -306,6 +423,10 @@ function Anivia:CastE(target)
 	end
 
 	if not IsReady(_E) or target == nil then
+		return
+	end
+	
+	if myHero.activeSpell and myHero.activeSpell.valid and myHero.activeSpell.isChanneling or myHero.activeSpell.isAutoAttack then
 		return
 	end
 	
@@ -405,11 +526,15 @@ function Anivia:CastR(target)
 		return
 	end
 	
+	if myHero.activeSpell and myHero.activeSpell.valid and myHero.activeSpell.isChanneling or myHero.activeSpell.isAutoAttack then
+		return
+	end
+	
 	if GetDistance(target.pos, myHero.pos) <= self.R.Range then
 		local data = myHero:GetSpellData(_R)
 		
 		if data.toggleState == 1 then
-			CastSpell(HK_R, target.pos, self.R.Range)
+			CastSpell(HK_R, target.pos, self.R.Range, 0)
 		elseif data.toggleState == 2 then
 			if not self:IsInStorm(target) then
 				Control.CastSpell(HK_R)
@@ -431,10 +556,22 @@ function Anivia:Combo()
 			self:CastQ()
 		else
 			self:CastQ(target)
-			self:CastR(target)
 			self:CastE(target)
+			self:CastR(target)
 			self:CastW(target)
 		end
+	end
+end
+
+function Anivia:OnDraw()
+	if IsReady(_Q) and self.Menu.Misc.DrawQ:Value() then
+		Draw.Circle(myHero.pos, self.Q.Range, Draw.Color(255, 255, 255, 255))
+	end
+	if IsReady(_E) and self.Menu.Misc.DrawE:Value() then
+		Draw.Circle(myHero.pos, self.E.Range, Draw.Color(255, 255, 255, 255))
+	end
+	if IsReady(_R) and self.Menu.Misc.DrawR:Value() then
+		Draw.Circle(myHero.pos, self.R.Range, Draw.Color(255, 174, 237, 255))
 	end
 end
 
