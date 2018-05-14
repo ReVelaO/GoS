@@ -266,7 +266,7 @@ function Anivia:Menu()
 	self.Menu:MenuElement({ type = SPACE })
 	self.Menu:MenuElement({ type = SPACE, name = "Developer: Kiara789" })
 	self.Menu:MenuElement({ type = SPACE, name = "League: 8.9" })
-	self.Menu:MenuElement({ type = SPACE, name = "Update 1" })
+	self.Menu:MenuElement({ type = SPACE, name = "Update 2" })
 end
 
 function Anivia:Spells()
