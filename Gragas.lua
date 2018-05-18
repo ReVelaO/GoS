@@ -53,6 +53,10 @@ function Distance(pos1, pos2)
 	return _pos1:DistanceTo(_pos2)
 end
 
+function IsValidBarrelName(str)
+	return str:lower():find("gragas") and str:lower():find("q") and str:lower():find("ally")	
+end
+
 class "Gragas"
 
 function Gragas:__init()
@@ -89,7 +93,7 @@ function Gragas:__init()
 	self.R = { Range = 1000, Delay = 300, Speed = 1750, Width = 400, Effect = 900 }
 
 	_G.Alpha.ObjectManager:OnParticleCreate(function(particle) 
-		if particle.valid and particle.name == "Gragas_Base_Q_Ally" then
+		if particle.valid and IsValidBarrelName(particle.name) then
 			self.LastBarrel.Valid = true
 			self.LastBarrel.Position = particle.pos
 			self.LastBarrel.Timer = GetTickCount()
@@ -97,7 +101,7 @@ function Gragas:__init()
 	end)
 
 	_G.Alpha.ObjectManager:OnParticleDestroy(function(particle) 
-		if particle.name == "Gragas_Base_Q_Ally" then
+		if IsValidBarrelName(particle.name) then
 			self.LastBarrel.Valid = false
 			self.LastBarrel.Position = nil
 		end
